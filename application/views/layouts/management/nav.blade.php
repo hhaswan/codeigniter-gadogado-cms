@@ -10,7 +10,7 @@
                 <li class="dropdown notifications-menu">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                     <i class="fa fa-bell-o"></i>
-                    <span class="label label-warning">10</span>
+                    <!--<span class="label label-warning">10</span>-->
                 </a>
                 <ul class="dropdown-menu">
                     <li class="header"><strong>Notifikasi</strong></li>
@@ -31,7 +31,7 @@
                 <li class="user user-menu" data-toggle="tooltip" data-placement="bottom" title="Profil">
                     <a href="#">
                         <img src="{{base_url()}}adminlte/img/user2-160x160.jpg" class="user-image" alt="User Image">
-                        <span class="hidden-xs">Alexander Pierce</span>
+                        <span class="hidden-xs">{{ session(((new MY_Controller())->admin_identifier))['full_name'] }}</span>
                     </a>
                 </li>
                 <li data-toggle="tooltip" data-placement="bottom" title="Keluar">

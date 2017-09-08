@@ -11,7 +11,7 @@
 			<section class="content-header">
 				<h1>{{$title}}</h1>
 				<ol class="breadcrumb">
-					@foreach(breadcrumb() as $key => $row)
+					@foreach(breadcrumb('mgmt') as $key => $row)
 						@if($key != 'li-active')
 							<li><a href="{{$key}}">{{$row}}</a></li>
 						@else

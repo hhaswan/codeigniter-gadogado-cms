@@ -7,7 +7,8 @@ use Carbon\Carbon;
 
 class MY_Controller extends MX_Controller {
     
-    protected $admin_identifier = 'admin_management';
+    public $admin_identifier = 'admin_management';
+    public $coba = "AAA";
 
     public function __construct(){
         parent::__construct();
@@ -32,7 +33,10 @@ class Admin_Controller extends MY_Controller {
     protected function session_check(){
         if(! session($this->admin_identifier)){
             // redirect ke login page
-            redirect(base_url(), 'refresh');
+            // redirect(base_url(), 'refresh');
+
+            // show halaman 404
+            show_404();
         }
     }
 }

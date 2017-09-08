@@ -38,6 +38,7 @@
 <link rel="stylesheet" href="{{base_url()}}adminlte/components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
 <link rel="stylesheet" href="{{base_url()}}adminlte/components/bootstrap-daterangepicker/daterangepicker.css">
 <link rel="stylesheet" href="{{base_url()}}adminlte/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css">
+<link rel="stylesheet" href="{{base_url()}}adminlte/plugins/sweetalert2/sweetalert2.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 @yield('custom_css')
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->

@@ -13,8 +13,17 @@
 <script src="{{base_url()}}adminlte/components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
 <script src="{{base_url()}}adminlte/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>
 <script src="{{base_url()}}adminlte/components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+<script src="{{base_url()}}adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
 <script src="{{base_url()}}adminlte/components/fastclick/lib/fastclick.js"></script>
 <script src="{{base_url()}}adminlte/js/adminlte.min.js"></script>
 <script src="{{base_url()}}adminlte/js/pages/dashboard.js"></script>
 <script src="{{base_url()}}adminlte/js/demo.js"></script>
 @yield('custom_js')
+<script>
+swal({
+  title: 'Error!',
+  text: 'Do you want to continue',
+  type: 'error',
+  confirmButtonText: 'Cool'
+});
+</script>
