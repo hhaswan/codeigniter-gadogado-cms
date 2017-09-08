@@ -7,19 +7,19 @@
 			<a href="{{base_url()}}"><b>Code</b>Igniter</a>
 		</div>
 		<h4 class="text-center">Masuk Ke Akun Anda</h4>
-        @if($this->session->flashdata('message'))
-		<div class="text-danger text-center">{{$this->session->flashdata('message')}}</div>
+        @if(flash('MSG_ERROR'))
+		<div class="text-danger text-center">{{flash('MSG_ERROR')}}</div>
         @endif
 		<br/>
 		<form method="POST" action="{{base_url(uri_string())}}">
 			<div class="form-group has-feedback">
                 <label for="email">Email</label>
-                <input type="email" class="form-control" id="email" placeholder="Email" required>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
 				<span class="fa fa-envelope form-control-feedback"></span>
 			</div>
 			<div class="form-group has-feedback">
                 <label for="password">Password</label>            
-				<input type="password" class="form-control" id="password" placeholder="Password" required>
+				<input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
 				<span class="fa fa-lock form-control-feedback"></span>
 			</div>
             <div class="row">
@@ -33,7 +33,7 @@
             <br/>
             <div class="row">
                 <div class="col-lg-12">
-                    <button type="submit" class="btn col-lg-12 btn-danger">Masuk</button>
+                    <button type="submit" class="btn col-lg-12 btn-danger" name="submit" value="submit">Masuk</button>
                 </div>
 			</div>
 		</form>

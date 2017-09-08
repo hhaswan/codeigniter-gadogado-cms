@@ -35,7 +35,7 @@
                     </a>
                 </li>
                 <li data-toggle="tooltip" data-placement="bottom" title="Keluar">
-                    <a href="#"><i class="fa fa-sign-out"></i></a>
+                    <a href="{{base_url('logout')}}"><i class="fa fa-sign-out"></i></a>
                 </li>
             </ul>
         </div>

@@ -1,7 +1,7 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
- /**
-* App Propertis
+/**
+* App Properties
 *
 * @return void
 * @author Dimas Wicaksono
@@ -12,6 +12,170 @@ if ( ! function_exists('app')){
         
         // get application's setting
         return (object) $CI->load->config('app');
+    }
+}
+
+/**
+* Encrypt
+*
+* @return string
+* @author Dimas Wicaksono
+**/
+if ( ! function_exists('encrypt')){
+    function encrypt($string){
+        $CI =& get_instance();
+        
+        $CI->encryption->initialize(array('cipher' => 'tripledes', 'mode' => 'cbc'));
+        $ciphertext = $CI->encryption->encrypt($string);
+        $str  		= str_replace(array('+', '/', '='), array('-', '_', '~'), $ciphertext);
+        $str 		= base64_encode($str);
+        $str  		= str_replace(array('+', '/', '='), array('-', '_', '~'), $str);		
+        return $str;
+    }
+}
+
+/**
+* Decrypt
+*
+* @return string
+* @author Dimas Wicaksono
+**/
+if ( ! function_exists('decrypt')){
+    function decrypt($string){
+        $CI =& get_instance();
+		
+		$CI->encryption->initialize(array('cipher' => 'tripledes','mode' => 'cbc'));
+		$string 	= str_replace(array('-', '_', '~'), array('+', '/', '='), $string);
+		$string 	= base64_decode($string);
+		$str 		= str_replace(array('-', '_', '~'), array('+', '/', '='), $string);
+		$str 		= $CI->encryption->decrypt($str);
+		return $str;
+    }
+}
+
+/**
+* POST Request
+*
+* @return string
+* @author Dimas Wicaksono
+**/
+if ( ! function_exists('post')){
+    function post($name = null){
+        $CI =& get_instance();
+        
+        // get application's setting
+        return $CI->input->post($name);
+    }
+}
+
+/**
+* GET Request
+*
+* @return string
+* @author Dimas Wicaksono
+**/
+if ( ! function_exists('get')){
+    function get($name = null){
+        $CI =& get_instance();
+        
+        // get application's setting
+        return $CI->input->get($name);
+    }
+}
+
+/**
+* Validation Helper
+*
+* @return boolean
+* @author Dimas Wicaksono
+**/
+if ( ! function_exists('validation')){
+    function validation($options){
+        $CI =& get_instance();
+        
+        // cek apakah options itu array atau bukan
+        if(is_array($options)){
+            // bila jumlah options ini lebih dari 1 maka looping array childnya
+            if(count($options[0]) > 1){
+                foreach($options as $row){
+                    if(is_array($row)){
+                        // cek apakah row itu array, bila array optionnya lebih dari satu
+                        $name       = (isset($row[0])) ? $row[0] : die("ERROR_ITEM_NAME_NOT_FOUND");
+                        $real_name  = (isset($row[1])) ? $row[1] : $name;
+                        $rule       = (isset($row[2])) ? $row[2] : NULL;
+                        $CI->form_validation->set_rules($name, $real_name, $rule);
+                    }
+                }
+            }else{
+                // bila bukan langsung masukkan dalam rule
+                $name       = (isset($options[0])) ? $options[0] : die("ERROR_ITEM_NAME_NOT_FOUND");
+                $real_name  = (isset($options[1])) ? $options[1] : $name;
+                $rule       = (isset($options[2])) ? $options[2] : NULL;
+                $CI->form_validation->set_rules($name, $real_name, $rule);
+            }
+
+            // running validation
+            return $CI->form_validation->run();
+        }
+    }
+}
+
+/**
+* Session
+*
+* @return mixed
+* @author Dimas Wicaksono
+**/
+if ( ! function_exists('session')){
+    function session($context = null, $is_temp = false){
+        $CI =& get_instance();
+        
+        // bila array maka, masukkan konten array ke dalam session
+        if(is_array($context)){
+            foreach($context as $key => $row){
+                // bila data temporary
+                if($is_temp){
+                    $CI->session->set_tempdata($key, $row, 600);
+                }else{
+                    $CI->session->set_userdata($key, $row);
+                }
+                $output = true;
+            }
+        }else{
+            // get result from session
+            if($is_temp){
+                $output = $CI->session->tempdata($context);                
+            }else{
+                $output = $CI->session->userdata($context);
+            }             
+        }
+
+        return $output;
+    }
+}
+
+/**
+* Flash Session
+*
+* @return mixed
+* @author Dimas Wicaksono
+**/
+if ( ! function_exists('flash')){
+    function flash($context = null){
+        $CI =& get_instance();
+        
+        // bila array maka, masukkan konten array ke dalam session
+        if(is_array($context)){
+            foreach($context as $key => $row){
+                $CI->session->set_flashdata($key, $row);
+            }
+            $output = true;            
+        }else{
+            // get result from session
+            $output = $CI->session->flashdata($context);
+        }
+
+        return $output;
     }
 }
 
@@ -38,6 +202,20 @@ if ( ! function_exists('access')){
             'module'        => $CI->router->fetch_module(),
             'param'         => $param
         ];
+    }
+}
+
+/**
+* Back (History -1)
+*
+* @return void
+* @author Dimas Wicaksono
+**/
+if ( ! function_exists('back')){
+    function back(){
+        $CI =& get_instance();
+
+        return $CI->agent->referrer();
     }
 }
 
