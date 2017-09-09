@@ -11,7 +11,6 @@ class Mgmt extends Admin_Controller {
     
     public function index(){
         // print_r(Carbon::now()->setTimeZone('Asia/Makassar'));
-
         $data['title'] = "Beranda";
         $this->slice->view('index', $data);
     }

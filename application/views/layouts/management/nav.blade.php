@@ -8,29 +8,29 @@
         <div class="navbar-custom-menu">
             <ul class="nav navbar-nav">
                 <li class="dropdown notifications-menu">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                    <i class="fa fa-bell-o"></i>
-                    <!--<span class="label label-warning">10</span>-->
-                </a>
-                <ul class="dropdown-menu">
-                    <li class="header"><strong>Notifikasi</strong></li>
-                    <li>
-                    <ul class="menu">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <i class="fa fa-bell-o"></i>
+                        <!--<span class="label label-warning">10</span>-->
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="header"><strong>Notifikasi</strong></li>
                         <li>
-                            <a href="#">
-                                Very long description here that may not fit into the
-                                page and may cause design problems<br/>
-                                <small>17 Juni 2017</small>
-                            </a>
+                        <ul class="menu">
+                            <li>
+                                <a href="#">
+                                    Very long description here that may not fit into the
+                                    page and may cause design problems<br/>
+                                    <small>17 Juni 2017</small>
+                                </a>
+                            </li>
+                        </ul>
                         </li>
+                        <li class="footer"><a href="#">Lihat Semua</a></li>
                     </ul>
-                    </li>
-                    <li class="footer"><a href="#">Lihat Semua</a></li>
-                </ul>
                 </li>
-                <li class="user user-menu" data-toggle="tooltip" data-placement="bottom" title="Profil">
+                <li data-toggle="tooltip" data-placement="bottom" title="Profil">
                     <a href="#">
-                        <img src="{{base_url()}}adminlte/img/user2-160x160.jpg" class="user-image" alt="User Image">
+                        <i class="fa fa-user-o"></i>&nbsp;
                         <span class="hidden-xs">{{ session(((new MY_Controller())->admin_identifier))['full_name'] }}</span>
                     </a>
                 </li>
