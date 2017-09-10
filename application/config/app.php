@@ -6,6 +6,7 @@ $config['app'] = [
     'tagline'           => "Tagline Aplikasi",
     'company'           => "Media Indonesia",
     'timezone'          => "Asia/Makassar",
-    'secure_login'      => false,
+    'secure_login'      => true,
+    'login_identifier'  => "brutos",
     'landing_page'      => true
 ];

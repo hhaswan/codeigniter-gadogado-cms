@@ -29,4 +29,39 @@ class M_session extends MY_Model{
 
         return $output;
     }
+
+    function coba(){
+        return $this->db->field_data('app_confirmations');
+    }
+
+    public function forget($user_id){
+
+        // generate token
+        $token  = random_string('alnum', 64);
+        if(! $entry = $this->get('app_confirmations', ['app_users_id' => $user_id, 'type' => 'F'])){
+            $i      = $this->insert('app_confirmations', [
+                'token'         => $token,
+                'app_users_id'  => $user_id,
+                'type'          => 'F'
+            ]);
+        }else{
+            $i = $this->update(
+                'app_confirmations', 
+                [ 'token' => $entry[0]->token],
+                [ 'token' => $token]
+            );
+        }
+        
+        if($i){
+            $output = $token;
+        }else{
+            $output = null;
+        }
+
+        return $output;
+    }
+
+    public function token($token, $type){
+        return $this->get('app_confirmations', ['token' => $token, 'type' => $type]);
+    }
 }

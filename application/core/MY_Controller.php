@@ -8,7 +8,6 @@ use Carbon\Carbon;
 class MY_Controller extends MX_Controller {
     
     public $admin_identifier = 'admin_management';
-    public $coba = "AAA";
 
     public function __construct(){
         parent::__construct();

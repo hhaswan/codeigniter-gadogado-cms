@@ -123,7 +123,7 @@ class MY_model extends CI_Model{
         if(empty($args)){
             return false;
         }elseif(is_array($args)){
-            $query = $this->db->update($this->table, $data, $args);
+            $query = $this->db->update($table, $data, $args);
             if($query){
                 $output = true;
             }

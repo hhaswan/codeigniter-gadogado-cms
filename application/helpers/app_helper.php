@@ -16,6 +16,48 @@ if ( ! function_exists('app')){
 }
 
 /**
+* Send Email
+*
+* @return boolean
+* @author Dimas Wicaksono
+**/
+if ( ! function_exists('send_email')){
+    function send_email($subject = null, $message, $sender, $respondent){
+        
+        $output = false;
+
+        // get CI instance
+        $CI =& get_instance();
+        
+        // load config for email library
+        $config = Array(
+            'protocol'  => getenv('MAIL_PROTOCOL'),
+            'smtp_host' => getenv('MAIL_HOST'),
+            'smtp_port' => getenv('MAIL_PORT'),
+            'smtp_user' => getenv('MAIL_USER'),
+            'smtp_pass' => getenv('MAIL_PASS'),
+            'crlf' => "\r\n",
+            'newline' => "\r\n"
+        );
+        $CI->load->library('email', $config);
+
+        // email operation
+        $CI->email->from((isset($sender)) ? $sender : getenv('MAIL_SENDER'));
+        $CI->email->to($respondent);
+        $CI->email->subject($subject);
+        $CI->email->message($message);
+
+        if($CI->email->send()){
+            $output = true;
+        }else{
+            show_error($CI->email->print_debugger());            
+        }
+
+        return $output;
+    }
+}
+
+/**
 * Encrypt
 *
 * @return string

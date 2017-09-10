@@ -1,6 +1,5 @@
 $(document).on("click", ".confirm-action", function(e) { 
     e.preventDefault();
-
     var link = $(this).attr('href');
     swal({
         title: "Konfirmasi Aksi",
@@ -10,7 +9,7 @@ $(document).on("click", ".confirm-action", function(e) {
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         confirmButtonText: 'OK',
-        cancelButtonText: 'TIDAK'
+        cancelButtonText: 'BATAL'
       }).then(function () {
         if(link != ''){
             $(location).attr('href', link);

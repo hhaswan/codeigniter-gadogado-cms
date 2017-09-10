@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="{{base_url()}}adminlte/components/Ionicons/css/ionicons.min.css">
 <link rel="stylesheet" href="{{base_url()}}adminlte/css/AdminLTE.min.css">
 <link rel="stylesheet" href="{{base_url()}}adminlte/plugins/iCheck/square/blue.css">
+<link rel="stylesheet" href="{{base_url()}}adminlte/plugins/sweetalert2/sweetalert2.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 @yield('custom_css')
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
