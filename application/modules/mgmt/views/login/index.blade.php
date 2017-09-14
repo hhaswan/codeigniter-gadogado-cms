@@ -24,7 +24,9 @@
 			</div>
             <div class="row">
                 <div class="col-lg-6">
-                    <a href="#"><i class="fa fa-user"></i> Daftarkan Akun</a>
+                    @if(app()->public_register)
+                    <a href="{{base_url('/register')}}"><i class="fa fa-user"></i> Daftarkan Akun</a>
+                    @endif
                 </div>
                 <div class="col-lg-6 text-right">
                     <a href="@php if(! app()->secure_login) echo base_url('forgot'); else echo base_url('forgot/'.app()->login_identifier) @endphp"><i class="fa fa-lock"></i> Lupa Password</a>

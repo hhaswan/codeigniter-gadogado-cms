@@ -1,3 +1,4 @@
+$('[data-toggle="tooltip"]').tooltip();
 $(document).on("click", ".confirm-action", function(e) { 
     e.preventDefault();
     var link = $(this).attr('href');

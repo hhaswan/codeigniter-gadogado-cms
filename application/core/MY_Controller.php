@@ -14,6 +14,7 @@ class MY_Controller extends MX_Controller {
 
         // models
         $this->load->model('mgmt/M_session','',TRUE);
+        $this->load->model('mgmt/M_registration','',TRUE);
         
         // default timezone
         date_default_timezone_set(app()->timezone);
@@ -22,20 +23,34 @@ class MY_Controller extends MX_Controller {
 
 // untuk subclass dengan pengecekan login
 class Admin_Controller extends MY_Controller {
-    public function __construct(){
+
+    protected $session_exception = [];
+
+    public function __construct(array $options = []){
         parent::__construct();
+
+        // initialization
+        $this->initialize($options);
 
         // cek sessionnya
         $this->session_check();
     }
 
+    protected function initialize($options){
+        foreach($options as $key => $row){
+            if(isset($this->$key)){
+                $this->$key = $row;
+            }
+        }
+    }
+
     protected function session_check(){
         if(! session($this->admin_identifier)){
-            // redirect ke login page
-            // redirect(base_url(), 'refresh');
 
             // show halaman 404
-            show_404();
+            if(! in_array(access()->method, $this->session_exception)){
+                show_404();
+            }
         }
     }
 }

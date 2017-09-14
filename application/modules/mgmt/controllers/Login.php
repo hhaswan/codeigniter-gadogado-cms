@@ -23,13 +23,19 @@ class Login extends Front_Controller {
                 // cek return validasinya
                 if($form_validate){
                     if(! empty($auth = $this->M_session->authenticate(post()))){
-                        $data = [
+                        $token  = random_string('alnum', 125);
+                        $data   = [
                             'user_id'   => $auth[0]->id,
                             'email'     => $auth[0]->email,
                             'role_id'   => $auth[0]->app_role_id,
-                            'full_name' => $auth[0]->full_name             
+                            'full_name' => $auth[0]->full_name,
+                            'token'     => $token
                         ];
                         session([$this->admin_identifier => $data]);
+
+                        // daftarkan session ke tabel session
+                        $this->M_session->create($token, $auth[0]->id);
+
                         redirect(base_url('mgmt'));
                     }else{
                         flash(['MSG_ERROR' => "Email dan Password tidak dapat ditemukan."]);
@@ -89,14 +95,14 @@ class Login extends Front_Controller {
                     $i = $this->M_session->update('app_users', ['id' => $result[0]->app_users_id], $data);
                     if($i){
                         // delete used token
-                        $this->M_session->delete('app_confirmations', [ 'token' => $token]);
+                        $this->M_session->delete('app_confirmations', [ 'token' => $token ]);
 
                         // success message 
                         flash(['GLOBAL_ALERT_SUCCESS' => 'Password Berhasil Diganti.']);
                         redirect("login/".app()->login_identifier);
                     }else{
                         // failed message
-                        flash(['GLOBAL_ALERT_SUCCESS' => 'Gagal Mengganti Password Anda.']);                        
+                        flash(['GLOBAL_ALERT_FAIL' => 'Gagal Mengganti Password Anda.']);                        
                         redirect(back());
                     }
                 }else{
@@ -108,19 +114,18 @@ class Login extends Front_Controller {
             }
         }elseif($this->_is_secure_login()){
             if($token == app()->login_identifier){
-                if(! post('submit_send')){
-                    
-                    // halaman forgot password
-                    $data['title'] = "Lupa Password";
-                    $this->slice->view('login.forgot', $data);
-                }else{
+                if(! post('submit_send') && app()->secure_login){
+                    // halaman reset password
+                    $data['title'] = "Atur Ulang Password";
+                    $this->slice->view('login.reset', $data);
+                }elseif(post('submit_send')){
                     // request post, validasi form level backend
                     $form_validate = validation([
                         ['email', 'Email', 'required']
                     ]);
                     
-                    // cek apakah email ini terdaftar
-                    $registered = $this->M_session->get('app_users', ['email' => post('email')]);
+                    // cek apakah email ini terdaftar dan aktif saja
+                    $registered = $this->M_session->get('app_users', ['email' => post('email'), 'status' => 1]);
 
                     // cek return validasinya
                     if($form_validate && $registered){
@@ -129,7 +134,7 @@ class Login extends Front_Controller {
                         if(! empty($token = $this->M_session->forget($registered[0]->id))){
                             // kirim email
                             $msg = "Reset Here: {$token}";
-                            if(send_email("Reset Password", $msg, null, "anna@example.com")){
+                            if(send_email("Reset Password", $msg, null, post('email'))){
                                 flash(['GLOBAL_ALERT_SUCCESS' => 'Periksa Email Anda untuk melanjutkan proses reset password.']);
                             }else{
                                 flash(['GLOBAL_ALERT_SUCCESS' => 'Email gagal dikirim, cobalah beberapa saat lagi.']);
@@ -149,11 +154,13 @@ class Login extends Front_Controller {
                         $data['title'] = "Lupa Password";
                         $this->slice->view('login.forgot', $data);
                     }
+                }else{
+                    show_404();    
                 }
             }else{
-                // halaman reset password
-                $data['title'] = "Atur Ulang Password";
-                $this->slice->view('login.reset', $data);
+                // halaman forgot password
+                $data['title'] = "Lupa Password";
+                $this->slice->view('login.forgot', $data);
             }
         }else{
             show_404();
@@ -164,7 +171,11 @@ class Login extends Front_Controller {
     public function logout(){
         // unset session yang valid saja, bila belum login, arahkan kembali ke halaman utama
         if(session($this->admin_identifier)){
+
+            // delete di tabel sessions
+            $this->M_session->delete('app_sessions', [ 'token' => session($this->admin_identifier)['token'] ]);
             $this->session->unset_userdata($this->admin_identifier);
+            
         }
 
         redirect(base_url(), 'refresh');
@@ -176,12 +187,11 @@ class Login extends Front_Controller {
         if(app()->secure_login){
             $segment = $this->uri->segment_array();
             if(end($segment) != app()->login_identifier){
-
                 // cari token di tabel app_confirmations
-                if(! $this->M_session->get('app_confirmations', ['token' => end($segment), 'type' => 'F'])){
-                    $output = false;
-                }
-
+                $output = false;
+            }elseif(! $this->M_session->get('app_confirmations', ['token' => end($segment), 'type' => 'F'])){
+                // cari token di tabel app_confirmations
+                $output = false;
             }
         }
 

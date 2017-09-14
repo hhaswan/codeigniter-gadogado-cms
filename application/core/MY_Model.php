@@ -64,8 +64,8 @@ class MY_model extends CI_Model{
     **/
     public function insert($table, $data = null){
         
-        // -1 untuk menunjukkan kalo operasi ini gagal/fail
-        $output = -1;
+        // 0 untuk menunjukkan kalo operasi ini gagal/fail
+        $output = 0;
         
         // mencegah tidak ada item dimasukkan
         if(empty($data)){
@@ -75,7 +75,7 @@ class MY_model extends CI_Model{
             if($query){
                 if($this->db->insert_id() == null || $this->db->insert_id() == 0){
                     // 0 berhasil tanpa ada insert_id nya
-                    $output = 0;
+                    $output = true;
                 }else{
                     $output = $this->db->insert_id();
                 }

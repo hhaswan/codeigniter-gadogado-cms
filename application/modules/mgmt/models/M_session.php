@@ -30,19 +30,15 @@ class M_session extends MY_Model{
         return $output;
     }
 
-    function coba(){
-        return $this->db->field_data('app_confirmations');
-    }
-
-    public function forget($user_id){
+    public function forget($user_id, $type = 'F'){
 
         // generate token
         $token  = random_string('alnum', 64);
-        if(! $entry = $this->get('app_confirmations', ['app_users_id' => $user_id, 'type' => 'F'])){
+        if(! $entry = $this->get('app_confirmations', ['app_users_id' => $user_id, 'type' => $type])){
             $i      = $this->insert('app_confirmations', [
                 'token'         => $token,
                 'app_users_id'  => $user_id,
-                'type'          => 'F'
+                'type'          => $type
             ]);
         }else{
             $i = $this->update(
@@ -51,12 +47,35 @@ class M_session extends MY_Model{
                 [ 'token' => $token]
             );
         }
-        
+
         if($i){
             $output = $token;
         }else{
-            $output = null;
+            $output = null;            
         }
+
+        return $output;
+    }
+
+    public function create($token, $user_id){
+        
+        $output = false;
+        
+        if(! empty($token) && ! empty($user_id)){
+            // salt password
+            $query  = $this->insert('app_sessions', [
+                'token'         => $token,
+                'created_at'    => \Carbon\Carbon::now(),
+                'user_agent'    => $this->agent->agent_string(),
+                'ip_address'    => $_SERVER['REMOTE_ADDR'],
+                'app_users_id'  => $user_id
+            ]);
+            
+            // return sesuai hasil query
+            if(empty($query) || $query == 0){
+                $output = true;
+            }
+        }            
 
         return $output;
     }
