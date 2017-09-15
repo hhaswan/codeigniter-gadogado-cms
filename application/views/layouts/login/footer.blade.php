@@ -7,7 +7,7 @@
 <script>
     swal({
         title: 'Aksi Berhasil',
-        text: '{{flash('GLOBAL_ALERT_SUCCESS')}}',
+        html: '{{flash('GLOBAL_ALERT_SUCCESS')}}',
         type: 'success',
         timer: 2500
     }).then(
@@ -19,7 +19,7 @@
 <script>
     swal({
         title: 'Aksi Gagal',
-        text: '{{flash('GLOBAL_ALERT_FAIL')}}',
+        html: '{{flash('GLOBAL_ALERT_FAIL')}}',
         type: 'error',
         timer: 2500
     }).then(

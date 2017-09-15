@@ -67,7 +67,7 @@ class M_session extends MY_Model{
                 'token'         => $token,
                 'created_at'    => \Carbon\Carbon::now(),
                 'user_agent'    => $this->agent->agent_string(),
-                'ip_address'    => $_SERVER['REMOTE_ADDR'],
+                'ip_address'    => $this->input->ip_address(),
                 'app_users_id'  => $user_id
             ]);
             

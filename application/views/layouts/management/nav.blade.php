@@ -1,5 +1,5 @@
 <header class="main-header">
-    <a href="index2.html" class="logo">
+    <a href="{{ base_url('mgmt') }}" class="logo">
         <span class="logo-mini"><b>CI</b></span>
         <span class="logo-lg"><b>Code</b>Igniter</span>
     </a>
@@ -29,7 +29,7 @@
                     </ul>
                 </li>
                 <li data-toggle="tooltip" data-placement="bottom" title="Profil">
-                    <a href="#">
+                    <a href="{{base_url('/profile')}}">
                         <i class="fa fa-user-o"></i>&nbsp;
                         <span class="hidden-xs">{{ session(((new MY_Controller())->admin_identifier))['full_name'] }}</span>
                     </a>

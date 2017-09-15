@@ -15,3 +15,5 @@ $route['forgot']                = 'mgmt/login/forgot';
 $route['forgot/(:any)']         = 'mgmt/login/forgot/$1';
 $route['forgot/(:any)/(:any)']  = 'mgmt/login/forgot/$1/$2';
 $route['logout']                = 'mgmt/login/logout';
+$route['profile']               = 'mgmt/profile/index';
+$route['profile/(:any)']        = 'mgmt/profile/index/$1';

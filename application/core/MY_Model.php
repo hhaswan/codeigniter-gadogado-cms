@@ -1,6 +1,8 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
 class MY_model extends CI_Model{
+
+    protected $table = null;
     
     /**
     * Get Entry
@@ -8,9 +10,13 @@ class MY_model extends CI_Model{
     * @return object
     * @author Dimas Wicaksono
     **/
-    public function get($table, $args = [], $like = [], $order_by = [], $limit = null, $offset = null){
+    public function get($table = null, $args = [], $like = [], $order_by = [], $limit = null, $offset = null){
 
         $output = false;
+
+        if(empty($table)){
+            $table = $this->table;
+        }
         
         // where clause
         if(! empty($args)){            
@@ -62,8 +68,12 @@ class MY_model extends CI_Model{
     * @return integer
     * @author Dimas Wicaksono
     **/
-    public function insert($table, $data = null){
+    public function insert($table = null, $data = null){
         
+        if(empty($table)){
+            $table = $this->table;
+        }
+
         // 0 untuk menunjukkan kalo operasi ini gagal/fail
         $output = 0;
         
@@ -91,7 +101,11 @@ class MY_model extends CI_Model{
     * @return boolean
     * @author Dimas Wicaksono
     **/
-    public function delete($table, $args = null){
+    public function delete($table = null, $args = null){
+        
+        if(empty($table)){
+            $table = $this->table;
+        }
 
         $output = false;
         
@@ -115,7 +129,11 @@ class MY_model extends CI_Model{
     * @return boolean
     * @author Dimas Wicaksono
     **/
-    public function update($table, $args = null, $data = null){
+    public function update($table = null, $args = null, $data = null){
+        
+        if(empty($table)){
+            $table = $this->table;
+        }
         
         $output = false;
         

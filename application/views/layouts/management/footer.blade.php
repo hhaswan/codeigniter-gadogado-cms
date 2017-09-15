@@ -5,16 +5,18 @@
 <script src="{{base_url()}}adminlte/components/bootstrap-daterangepicker/daterangepicker.js"></script>
 <script src="{{base_url()}}adminlte/components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
 <script src="{{base_url()}}adminlte/components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+<script src="{{base_url()}}adminlte/plugins/iCheck/icheck.min.js"></script>
 <script src="{{base_url()}}adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
 <script src="{{base_url()}}adminlte/js/adminlte.min.js"></script>
-<script src="{{base_url()}}adminlte/js/app.js"></script>
 @yield('custom_js')
+<script src="{{base_url()}}adminlte/js/app.js"></script>
 @if(flash('GLOBAL_ALERT_SUCCESS'))
 <script>
     swal({
         title: 'Aksi Berhasil',
-        text: '{{flash('GLOBAL_ALERT_SUCCESS')}}',
+        html: '{{flash('GLOBAL_ALERT_SUCCESS')}}',
         type: 'success',
+        confirmButtonClass: 'btn btn-primary',
         timer: 2500
     }).then(
         function () {},
@@ -25,8 +27,9 @@
 <script>
     swal({
         title: 'Aksi Gagal',
-        text: '{{flash('GLOBAL_ALERT_FAIL')}}',
+        html: '{{flash('GLOBAL_ALERT_FAIL')}}',
         type: 'error',
+        confirmButtonClass: 'btn btn-primary',
         timer: 2500
     }).then(
         function (dismiss) {}

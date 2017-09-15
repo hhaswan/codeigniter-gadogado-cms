@@ -7,36 +7,69 @@ use Carbon\Carbon;
 
 class MY_Controller extends MX_Controller {
     
-    public $admin_identifier = 'admin_management';
+    public $admin_identifier        = 'admin_management';
+    public $request_method_post     = false;
+    public $request_method_get      = false;
+    public $request_method_put      = false;
+    public $request_method_patch    = false;
+    public $request_method_delete   = false;
+    public $request_data            = [];
 
     public function __construct(){
         parent::__construct();
 
         // models
+        $this->load->model('mgmt/M_role','',TRUE);
         $this->load->model('mgmt/M_session','',TRUE);
         $this->load->model('mgmt/M_registration','',TRUE);
         
         // default timezone
         date_default_timezone_set(app()->timezone);
+
+        $this->_iniziatizate();
+    }
+
+    function _iniziatizate(){
+        // request method user
+        switch($this->input->method()){
+            case "post":
+                $this->request_method_post      = true;
+                break;
+            case "put":
+                $this->request_method_put       = true;
+                break;
+            case "patch":
+                $this->request_method_patch     = true;
+                break;
+            case "delete":
+                $this->request_method_delete    = true;
+                break;
+            default:
+                $this->request_method_get       = true;
+                break;
+        }
+
+        // dapatkan request data user
+        $this->request_data = $this->input->input_stream();
     }
 }
 
 // untuk subclass dengan pengecekan login
 class Admin_Controller extends MY_Controller {
 
-    protected $session_exception = [];
+    protected $session_exception    = [];
+    protected $user_data            = [];
 
     public function __construct(array $options = []){
         parent::__construct();
 
-        // initialization
         $this->initialize($options);
-
-        // cek sessionnya
         $this->session_check();
+        $this->get_data_user();
     }
 
     protected function initialize($options){
+        // initialization
         foreach($options as $key => $row){
             if(isset($this->$key)){
                 $this->$key = $row;
@@ -44,7 +77,20 @@ class Admin_Controller extends MY_Controller {
         }
     }
 
+    protected function get_data_user(){
+        $output = [];
+        $output += session($this->admin_identifier);
+
+        // get nama role
+        if($q = $this->M_role->get(null, [ 'id' => $output['role_id'] ])){
+            $output += ['role_name' => $q[0]->name];
+        }
+
+        return $this->user_data = (object) $output;
+    }
+
     protected function session_check(){
+        // cek sssion user
         if(! session($this->admin_identifier)){
 
             // show halaman 404

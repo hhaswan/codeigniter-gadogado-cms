@@ -59,7 +59,7 @@ class Registration extends Admin_Controller {
                     $data['title'] = "Pendaftaran Berhasil";
                     $this->slice->view('registration.message', $data);
                 }else{
-                    // success message 
+                    // fail message 
                     flash(['GLOBAL_ALERT_FAIL' => 'Akun Gagal Dibuat, Silakan Ulangi Lagi.']);
                     redirect(back());
                 }

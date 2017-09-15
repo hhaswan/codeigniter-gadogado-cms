@@ -16,6 +16,34 @@ if ( ! function_exists('app')){
 }
 
 /**
+* Filter Form
+*
+* @return string
+* @author Dimas Wicaksono
+**/
+if ( ! function_exists('filter_form')){
+    function filter_form(array $content = []){
+
+        $output = null;
+
+        $CI =& get_instance();
+        
+        if(! empty($content) && is_array($content)){
+            foreach($content as $key => $val){
+                $output .= '<div class="form-group">
+                            <label class="col-sm-3 control-label">'.$key.'</label>
+                            <div class="col-sm-9">
+                                '.$val.'
+                            </div>
+                        </div>';
+            }
+        }
+
+        return $output;
+    }
+}
+
+/**
 * Send Email
 *
 * @return boolean
