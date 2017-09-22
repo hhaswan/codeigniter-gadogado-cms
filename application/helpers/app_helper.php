@@ -26,8 +26,6 @@ if ( ! function_exists('filter_form')){
 
         $output = null;
 
-        $CI =& get_instance();
-        
         if(! empty($content) && is_array($content)){
             foreach($content as $key => $val){
                 $output .= '<div class="form-group">
@@ -39,6 +37,66 @@ if ( ! function_exists('filter_form')){
             }
         }
 
+        return $output;
+    }
+}
+
+/**
+* Table Generator
+*
+* @return string
+* @author Dimas Wicaksono
+**/
+if ( ! function_exists('generate_table')){
+    function generate_table(){
+        $CI =& get_instance();
+        
+        $template = array(
+            'table_open'            => '<div class="table-responsive"><table class="table table-bordered table-hover datatable">',
+            'thead_open'            => '<thead style="background:#EEE">',
+            'thead_close'           => '</thead>',
+            'heading_row_start'     => '<tr>',
+            'heading_row_end'       => '</tr>',
+            'heading_cell_start'    => '<th style="vertical-align:middle;">',
+            'heading_cell_end'      => '</th>',
+            'tbody_open'            => '<tbody>',
+            'tbody_close'           => '</tbody>',
+            'row_start'             => '<tr>',
+            'row_end'               => '</tr>',
+            'cell_start'            => '<td style="vertical-align:middle;">',
+            'cell_end'              => '</td>',
+            'row_alt_start'         => '<tr>',
+            'row_alt_end'           => '</tr>',
+            'cell_alt_start'        => '<td style="vertical-align:middle;">',
+            'cell_alt_end'          => '</td>',    
+            'table_close'           => '</table></div>'
+        );
+        $CI->table->set_template($template);
+    
+        return $CI->table->generate();
+    }
+}
+
+/**
+* Actions Button Generator
+*
+* @return string
+* @author Dimas Wicaksono
+**/
+if ( ! function_exists('generate_actions')){
+    function generate_actions(array $option = []){
+        $output = [];
+        $list   = null;
+        foreach($option as $key => $row){
+            if($key == 'delete'){
+                $list .= '<li class="divider"></li><li>'.$row.'</li>';
+            }else{
+                $list .= '<li>'.$row.'</li>';
+            }
+        }
+        $output = '<div class="btn-group"><button type="button" class="btn btn-primary btn-flat btn-xs dropdown-toggle" data-toggle="dropdown">
+                        <i class="fa fa-cog"></i>&nbsp;<span class="caret"></span><span class="sr-only">Toggle Dropdown</span>
+                   </button><ul class="dropdown-menu dropdown-menu-right" role="menu">'.$list.'</ul></div>';
         return $output;
     }
 }

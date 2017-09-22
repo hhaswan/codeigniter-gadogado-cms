@@ -11,7 +11,8 @@ class M_session extends MY_Model{
         // cek email dan password
         if(key_exists("email", $request) && key_exists("password", $request)){
             $query = $this->get($this->table, [
-                'email'     => $request['email']
+                'email'     => $request['email'],
+                'status'    => 1
             ]);
             
             // cek hashed password user

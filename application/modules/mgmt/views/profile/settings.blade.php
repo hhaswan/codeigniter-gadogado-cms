@@ -27,7 +27,7 @@
     <div class="form-group">
         <label for="bio" class="col-sm-2 col-sm-offset-1 control-label">Deskripsi (Bio)</label>
         <div class="col-sm-7">
-            <textarea name="bio" class="form-control" rows="3" placeholder="Deskripsi (Bio) Anda...">{{ $bio }}</textarea>
+            <textarea name="bio" class="form-control" rows="3" placeholder="Deskripsi (Bio) Anda...">{{ strip_tags($bio); }}</textarea>
         </div>
     </div>
     <div class="form-group">

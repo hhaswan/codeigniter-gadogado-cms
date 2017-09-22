@@ -12,7 +12,28 @@ $('.btn-filter').click(function(){
 });
 
 // datatable
-$('.datatable').DataTable();
+$('.datatable').DataTable({
+    "order": [],
+    "columnDefs": [ {
+        "targets"   : 'no-sort',
+        "orderable" : false,
+        "className" : "text-center"
+    } ],
+    "language": {
+        "search"        : "Cari Entri:",
+        "info"          : "Entri ke _START_ - _END_ dari _TOTAL_",
+        "infoEmpty"     : "Entri ke 0",
+        "infoFiltered"  : "( _MAX_ entri terfilter)",
+        "lengthMenu"    : "Tampilkan _MENU_",
+        "zeroRecords"   : "Entri Tidak Ditemukan",
+        "paginate"      : {
+                            "first"     : "Pertama",
+                            "last"      : "Terakhir",
+                            "next"      : "Berikutnya",
+                            "previous"  : "Sebelumnya"
+                          }
+    }
+});
 
 // Bootstrap Tooltip
 $('[data-toggle="tooltip"]').tooltip();

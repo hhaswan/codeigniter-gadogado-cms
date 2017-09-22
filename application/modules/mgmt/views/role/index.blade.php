@@ -15,7 +15,7 @@
                     <button type="button" class="btn btn-primary btn-sm">
                         <i class="fa fa-plus"></i> <span class="hidden-xs">Tambah Data</span>
                     </button>
-                    <button type="button" class="btn btn-danger btn-sm">
+                    <button type="button" class="btn btn-danger btn-sm btn-erase" data-url="{{base_url(uri_string().'/delete')}}" disabled>
                         <i class="fa fa-trash"></i> <span class="hidden-xs">Hapus Data</span>
                     </button>
                 </div>
@@ -27,29 +27,11 @@
                     </div>
                 </div>                
                 @endif
-                <div class="box-body table-responsive">
-                    <table class="table table-bordered table-striped datatable">
-                        <thead>
-                            <tr>
-                                <th>Rendering engine</th>
-                                <th>Browser</th>
-                                <th>Platform(s)</th>
-                                <th>Engine version</th>
-                                <th>CSS grade</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Trident</td>
-                                <td>Internet
-                                    Explorer 4.0
-                                </td>
-                                <td>Win 95+</td>
-                                <td> 4</td>
-                                <td>X</td>
-                            </tr>
-                        </tbody>
-                    </table>                        
+                <div class="box-body" id="table-result-box">
+                    {{ $body }}
+                </div>
+                <div class="overlay" style="display:none">
+                    <i class="fa fa-refresh fa-spin"></i>
                 </div>
             </div>
         </div>
@@ -57,13 +39,146 @@
 </div>
 @endsection
 
-@section('custom_css')
-<link rel="stylesheet" href="{{base_url()}}adminlte/plugins/bootstrap-select/bootstrap-select.min.css">
-<link rel="stylesheet" href="{{base_url()}}adminlte/components/datatables.net-bs/css/dataTables.bootstrap.min.css">
-@endsection
-
 @section('custom_js')
-<script src="{{base_url()}}adminlte/plugins/bootstrap-select/bootstrap-select.min.js"></script>
-<script src="{{base_url()}}adminlte/components/datatables.net/js/jquery.dataTables.min.js"></script>
-<script src="{{base_url()}}adminlte/components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script>
+$('.check-all').on('ifChanged', function(event){
+    if(event.target.checked){
+        $('.check-all-child').each(function(){
+            $(this).iCheck('check');
+        });
+    }else{
+        var a = $('.check-all-child').filter(':checked').length;
+        var b = $('.check-all-child').length;
+
+        // bila semua child check, maka uncheck semua
+        if(a == b){
+            $('.check-all-child').each(function(){
+                $(this).iCheck('uncheck');
+                $('.btn-erase').attr('disabled','disabled');
+            });
+        }
+    }
+});
+
+$('.check-all-child').on('ifChecked', function(event){
+    $('.btn-erase').removeAttr('disabled','disabled');
+});
+
+$('.check-all-child').on('ifUnchecked', function(event){
+    $('.check-all').iCheck('uncheck');
+    var a = $('.check-all-child').filter(':checked').length;
+
+    // bila semua child tidak check, maka disable button
+    if(a == 0){
+        $('.btn-erase').attr('disabled','disabled');
+    }
+});
+
+$(document).on('click','.btn-erase-single',function(e){
+    e.preventDefault();
+    
+    var d_id  = $(this).data('id');
+    var d_url = $(this).data('url');
+
+    if(d_id != '' && d_url != ''){
+        swal({
+            title: "Konfirmasi Aksi",
+            html: "Apakah Anda yakin ingin menghapus entri ini?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'OK',
+            cancelButtonText: 'BATAL'
+        }).then(function () {
+            $.ajax({
+                url     : d_url,
+                type    : "delete",
+                data    : { id: d_id },
+                dataType: "json",
+                beforeSend: function(){
+                    $('.overlay').fadeIn('fast');
+                },
+                success : function(data){
+                    $('.overlay').fadeOut('fast');
+                    $('#table-result-box').html(data.html);
+                    if(data.status){
+                        swal({
+                            title: 'Aksi Berhasil',
+                            html: 'Entri berhasil dihapus!',
+                            type: 'success',
+                            confirmButtonClass: 'btn btn-primary',
+                            timer: 2500
+                        });
+                    }else{
+                        swal({
+                            title: 'Aksi Gagal',
+                            html: 'Entri gagal dihapus',
+                            type: 'error',
+                            confirmButtonClass: 'btn btn-primary',
+                            timer: 2500
+                        });
+                    }
+                }
+            });
+        });
+    }
+
+});
+
+$(document).on('click','.btn-erase',function(){
+    var d_url = $(this).data('url');
+    var collection  = [];
+
+    // hapus semua yg ada
+    $('.check-all-child').filter(':checked').each(function(){
+        collection.push($(this).data('id'));
+    });
+
+    // fire ajax
+    if(collection.length != 0 && d_url != ''){
+         swal({
+            title: "Konfirmasi Aksi",
+            html: "Apakah Anda yakin ingin menghapus entri ini?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'OK',
+            cancelButtonText: 'BATAL'
+        }).then(function () {
+            $.ajax({
+                url     : d_url,
+                type    : "delete",
+                data    : { id: collection },
+                dataType: "json",
+                beforeSend: function(){
+                    $('.overlay').fadeIn('fast');
+                },
+                success : function(data){
+                    $('.overlay').fadeOut('fast');
+                    $('#table-result-box').html(data.html);
+                    if(data.status){
+                        swal({
+                            title: 'Aksi Berhasil',
+                            html: 'Entri berhasil dihapus!',
+                            type: 'success',
+                            confirmButtonClass: 'btn btn-primary',
+                            timer: 2500
+                        });
+                    }else{
+                        swal({
+                            title: 'Aksi Gagal',
+                            html: 'Entri gagal dihapus',
+                            type: 'error',
+                            confirmButtonClass: 'btn btn-primary',
+                            timer: 2500
+                        });
+                    }
+                }
+            });
+        });
+    }
+});
+</script>
 @endsection

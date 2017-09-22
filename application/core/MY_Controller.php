@@ -59,6 +59,7 @@ class Admin_Controller extends MY_Controller {
 
     protected $session_exception    = [];
     protected $user_data            = [];
+    protected $user_permission      = [];
 
     public function __construct(array $options = []){
         parent::__construct();
@@ -79,14 +80,22 @@ class Admin_Controller extends MY_Controller {
 
     protected function get_data_user(){
         $output = [];
-        $output += session($this->admin_identifier);
-
+        
         // get nama role
-        if($q = $this->M_role->get(null, [ 'id' => $output['role_id'] ])){
-            $output += ['role_name' => $q[0]->name];
+        if($this->session_check()){
+            $output += session($this->admin_identifier);
+            if($q = $this->M_role->get(null, [ 'id' => $output['role_id'] ])){
+                $output += [ 'role_name' => $q[0]->name, 'alias' => $q[0]->alias ];
+            }
         }
 
         return $this->user_data = (object) $output;
+    }
+
+    protected function permission_check(){
+
+        // cek permission user untuk mengakses halaman tertentu
+
     }
 
     protected function session_check(){

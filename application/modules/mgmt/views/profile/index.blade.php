@@ -33,7 +33,7 @@
 
                 <strong><i class="fa fa-sticky-note-o margin-r-5"></i> Tentang Saya</strong>
                 <p class="text-muted text-justify">
-                    {{ $bio }}
+                    {{ (! empty($result[0]->bio)) ? $result[0]->bio : "<em class='text-muted'>Tidak Ada Data</em>" }}
                 </p>
             </div>
         </div>

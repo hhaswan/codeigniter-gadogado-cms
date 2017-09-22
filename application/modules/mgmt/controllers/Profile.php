@@ -18,7 +18,7 @@ class Profile extends Admin_Controller {
             
             $result  = $this->M_session->get('app_users', [ 'id' => $user_id]);
             if($result){
-                $data['bio']    = (! empty($result[0]->bio)) ? $result[0]->bio : "<em class='text-muted'>Tidak Ada Data</em>";
+                $data['bio']    = $result[0]->bio;
                 $data['reg']    = Carbon::parse($result[0]->created_at)->toFormattedDateString();
                 $data['email']  = $result[0]->email;
                 $data['name']   = $result[0]->full_name;

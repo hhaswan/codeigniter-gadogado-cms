@@ -28,7 +28,7 @@
 <link rel="apple-touch-icon" href="{{base_url()}}adminlte/apple-touch-icon.png">
 <link rel="icon" href="{{base_url()}}adminlte/favicon.ico">
 
-<link rel="stylesheet" href="{{base_url()}}adminlte/components/bootstrap/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="{{base_url()}}adminlte/components/bootstrap/dist/css/bootstrap.css">
 <link rel="stylesheet" href="{{base_url()}}adminlte/components/font-awesome/css/font-awesome.min.css">
 <link rel="stylesheet" href="{{base_url()}}adminlte/components/Ionicons/css/ionicons.min.css">
 <link rel="stylesheet" href="{{base_url()}}adminlte/css/AdminLTE.min.css">
@@ -38,6 +38,8 @@
 <link rel="stylesheet" href="{{base_url()}}adminlte/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css">
 <link rel="stylesheet" href="{{base_url()}}adminlte/plugins/iCheck/all.css">
 <link rel="stylesheet" href="{{base_url()}}adminlte/plugins/sweetalert2/sweetalert2.min.css">
+<link rel="stylesheet" href="{{base_url()}}adminlte/plugins/bootstrap-select/bootstrap-select.min.css">
+<link rel="stylesheet" href="{{base_url()}}adminlte/components/datatables.net-bs/css/dataTables.bootstrap.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 @yield('custom_css')
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
