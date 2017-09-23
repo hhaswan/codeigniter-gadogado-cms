@@ -59,7 +59,8 @@ class Admin_Controller extends MY_Controller {
 
     protected $session_exception    = [];
     protected $user_data            = [];
-    protected $user_permission      = [];
+    protected $user_permission      = false;
+    protected $user_priviledge      = null;
 
     public function __construct(array $options = []){
         parent::__construct();
@@ -67,6 +68,7 @@ class Admin_Controller extends MY_Controller {
         $this->initialize($options);
         $this->session_check();
         $this->get_data_user();
+        $this->permission_check();
     }
 
     protected function initialize($options){
@@ -94,8 +96,40 @@ class Admin_Controller extends MY_Controller {
 
     protected function permission_check(){
 
-        // cek permission user untuk mengakses halaman tertentu
+        $output = [
+            'edit'   => false,
+            'view'   => false,
+            'delete' => false,
+            'add'    => false
+        ];
 
+        // ganti ke database ini
+        $priv   = [
+            'edit'   => 1,
+            'view'   => 1,
+            'delete' => 1,
+            'add'    => 1
+        ];
+
+        // cek permission user untuk mengakses halaman tertentu
+        // TODO: cek juga halaman indexnya untuk dapatkan priviledge di child page
+        if($priv){
+            // permission per page
+            $this->user_permission = true;
+
+            // priviledge per page
+            if($priv['edit'] == 1){
+                $output['edit'] = true;
+            }if($priv['view'] == 1){
+                $output['view'] = true;
+            }if($priv['delete'] == 1){
+                $output['delete'] = true;
+            }if($priv['add'] == 1){
+                $output['add'] = true;
+            }
+        }
+
+        $this->user_priviledge = (object) $output;
     }
 
     protected function session_check(){

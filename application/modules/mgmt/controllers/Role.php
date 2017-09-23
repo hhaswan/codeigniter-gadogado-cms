@@ -12,6 +12,7 @@ class Role extends Admin_Controller {
     }
     
     public function index(){
+        $data['priv']   = $this->user_priviledge;
         $data['body']   = $this->_result_table();
         $data['title']  = "Management {$this->module}";
         $this->slice->view('role.index', $data);
@@ -27,6 +28,7 @@ class Role extends Admin_Controller {
                 anchor(base_url('Link 2'), '<i class="fa fa-eye"></i> Lihat Entri', 'target="_blank"'),
             ];*/
 
+            $data['priv']   = $this->user_priviledge;            
             $data['body']   = $this->_result_table();
             $data['title']  = "Tambah {$this->module}";
             $this->slice->view('role.create', $data);
@@ -78,6 +80,7 @@ class Role extends Admin_Controller {
             if(! empty($id_en) && $q){
                 $data['id']     = $id_en;
                 $data['q']      = $q;
+                $data['priv']   = $this->user_priviledge;
                 $data['body']   = $this->_result_table();
                 $data['title']  = "Edit {$this->module}";
                 $this->slice->view('role.edit', $data);
@@ -174,7 +177,7 @@ class Role extends Admin_Controller {
                 /*'view'      => anchor(base_url(uri_string().'/detail/'.$row->id), '<i class="fa fa-eye"></i> Lihat Entri', 'target="_blank"'),*/
                 'edit'      => anchor(base_url(uri_string().'/edit/'.encrypt($row->id)), '<i class="fa fa-edit"></i> Edit Entri', 'target="_blank"'),
                 'delete'    => anchor(base_url(uri_string()), '<i class="fa fa-trash"></i> Hapus Entri', 'class="btn-erase-single text-red" data-url="'.base_url(uri_string().'/delete').'" data-id="'.encrypt($row->id).'"'),
-            ]);
+            ], $this->user_priviledge);
 
             $this->table->add_row(
                 ['data' => '<input type="checkbox" class="icheck check-all-child" data-id="'.encrypt($row->id).'" />'],

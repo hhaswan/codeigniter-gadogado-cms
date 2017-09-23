@@ -84,16 +84,28 @@ if ( ! function_exists('generate_table')){
 * @author Dimas Wicaksono
 **/
 if ( ! function_exists('generate_actions')){
-    function generate_actions(array $option = []){
+    function generate_actions(array $option = [], $permission = null){
         $output = [];
         $list   = null;
         foreach($option as $key => $row){
-            if($key == 'delete'){
-                $list .= '<li class="divider"></li><li>'.$row.'</li>';
-            }else{
-                $list .= '<li>'.$row.'</li>';
+            // cek permission
+            if(! empty($permission)){
+                if(isset($permission->$key)){
+                    if($key == 'delete'){
+                        $list .= '<li class="divider"></li><li>'.$row.'</li>';
+                    }else{
+                        $list .= '<li>'.$row.'</li>';
+                    }
+                }     
+            }else{    
+                if($key == 'delete'){
+                    $list .= '<li class="divider"></li><li>'.$row.'</li>';
+                }else{
+                    $list .= '<li>'.$row.'</li>';
+                }
             }
         }
+
         $output = '<div class="btn-group"><button type="button" class="btn btn-primary btn-flat btn-xs dropdown-toggle" data-toggle="dropdown">
                         <i class="fa fa-cog"></i>&nbsp;<span class="caret"></span><span class="sr-only">Toggle Dropdown</span>
                    </button><ul class="dropdown-menu dropdown-menu-right" role="menu">'.$list.'</ul></div>';

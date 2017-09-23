@@ -10,9 +10,11 @@
                     </a>
                 </div>
                 <div class="box-title pull-right btn-group">
+                    @if($priv->add)
                     <a href="{{ str_replace('/edit/'.$id, '/create', base_url(uri_string())) }}" class="btn btn-primary btn-sm">
                         <i class="fa fa-plus"></i> <span class="hidden-xs">Tambah Data</span>
                     </a>
+                    @endif
                 </div>
             </div>
                 <div class="box-body">
