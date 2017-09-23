@@ -12,9 +12,9 @@
                 </div>
                 @endif
                 <div class="box-title pull-right btn-group">
-                    <button type="button" class="btn btn-primary btn-sm">
+                    <a href="{{ base_url(uri_string().'/create') }}" class="btn btn-primary btn-sm">
                         <i class="fa fa-plus"></i> <span class="hidden-xs">Tambah Data</span>
-                    </button>
+                    </a>
                     <button type="button" class="btn btn-danger btn-sm btn-erase" data-url="{{base_url(uri_string().'/delete')}}" disabled>
                         <i class="fa fa-trash"></i> <span class="hidden-xs">Hapus Data</span>
                     </button>
@@ -126,7 +126,9 @@ $(document).on('click','.btn-erase-single',function(e){
 
 });
 
-$(document).on('click','.btn-erase',function(){
+$(document).on('click','.btn-erase',function(e){
+    e.preventDefault();
+    
     var d_url = $(this).data('url');
     var collection  = [];
 

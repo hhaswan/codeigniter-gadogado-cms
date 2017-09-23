@@ -13,9 +13,15 @@
 				<ol class="breadcrumb">
 					@foreach(breadcrumb('mgmt') as $key => $row)
 						@if($key != 'li-active')
-							<li><a href="{{$key}}">{{$row}}</a></li>
+							<li><a href="{{$key}}">{{ $row }}</a></li>
 						@else
-							<li class="active">{{$row}}</li>
+							<li class="active">
+								@if(strlen($row) > 30) 
+									{{ substr($row, 0, 30) }}
+								@else 
+									{{ $row }}
+								@endif
+							</li>
 						@endif
 					@endforeach
 				</ol>
