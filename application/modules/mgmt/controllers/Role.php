@@ -82,8 +82,8 @@ class Role extends Admin_Controller {
                 $data['title']  = "Edit {$this->module}";
                 $this->slice->view('role.edit', $data);
             }
-            
-        }else{
+
+        }elseif(post('submit') && post('method') == '_patch'){
             // get data sesuai dengan id ini
             $id = decrypt($id_en);
             $q  = $this->M_role->get(null, [ 'id' => $id ]);

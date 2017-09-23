@@ -21,6 +21,7 @@
                             <div class="text-danger text-center">{{flash('MSG_ERROR')}}</div>
                         @endif
                         <form method="post" action="{{ base_url(uri_string()) }}">
+                            <input type="hidden" value="_patch" name="method" />
                             <div class="form-group">
                                 <label>Nama Role</label>
                                 <input type="text" class="form-control" name="name" placeholder="Nama Role" value="{{ $q[0]->name }}" required>
