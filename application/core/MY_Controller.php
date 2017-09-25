@@ -99,7 +99,7 @@ class Admin_Controller extends MY_Controller {
 
         $output = [
             'edit'   => false,
-            'view'   => false,
+            'detail' => false,
             'delete' => false,
             'add'    => false
         ];
@@ -107,7 +107,7 @@ class Admin_Controller extends MY_Controller {
         // ganti ke database ini
         $priv   = [
             'edit'   => 1,
-            'view'   => 1,
+            'detail' => 1,
             'delete' => 1,
             'add'    => 1
         ];
@@ -121,8 +121,8 @@ class Admin_Controller extends MY_Controller {
             // priviledge per page
             if($priv['edit'] == 1){
                 $output['edit'] = true;
-            }if($priv['view'] == 1){
-                $output['view'] = true;
+            }if($priv['detail'] == 1){
+                $output['detail'] = true;
             }if($priv['delete'] == 1){
                 $output['delete'] = true;
             }if($priv['add'] == 1){

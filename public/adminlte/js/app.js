@@ -104,6 +104,7 @@ $(document).on('click','.btn-erase-single',function(e){
     
     var d_id  = $(this).data('id');
     var d_url = $(this).data('url');
+    var d_rdr = $(this).data('redirect');
 
     if(d_id != '' && d_url != ''){
         swal({
@@ -122,14 +123,15 @@ $(document).on('click','.btn-erase-single',function(e){
                 data    : { id: d_id },
                 dataType: "json",
                 beforeSend: function(){
-                    $('.overlay').fadeIn('fast');
+                    if(d_rdr != '' && d_rdr !== undefined){
+                        // normal table
+                        $('.overlay').fadeIn('fast');
+                    }
                 },
                 success : function(data){
                     $('.overlay').fadeOut('fast');
-                    $('#table-result-box').html(data.html);
-
+                    
                     if(data.status){
-                        reinitialize_datatable();
                         swal({
                             title: 'Aksi Berhasil',
                             html: 'Entri berhasil dihapus!',
@@ -137,6 +139,14 @@ $(document).on('click','.btn-erase-single',function(e){
                             confirmButtonClass: 'btn btn-primary',
                             timer: 2500
                         });
+
+                        if(d_rdr != '' && d_rdr !== undefined){
+                            $('#table-result-box').html(data.html);
+                            reinitialize_datatable();
+                        }else{
+                            // redirect
+                            $(location).attr('href', d_rdr);                            
+                        }
                     }else{
                         swal({
                             title: 'Aksi Gagal',

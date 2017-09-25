@@ -10,7 +10,7 @@ class MY_model extends CI_Model{
     * @return object
     * @author Dimas Wicaksono
     **/
-    public function get($table = null, $args = [], $like = [], $order_by = [], $limit = null, $offset = null){
+    public function get($table = null, $args = [], $like = [], $order_by = [], $group_by = null, $limit = null, $offset = null){
 
         $output = false;
 
@@ -40,6 +40,11 @@ class MY_model extends CI_Model{
             }else{
                 $this->db->like($like);
             }
+        }
+
+        // group_by
+        if(! empty($group_by)){
+            $this->db->group_by($group_by); 
         }
 
         // order by clause
@@ -68,7 +73,7 @@ class MY_model extends CI_Model{
     * @return object
     * @author Dimas Wicaksono
     **/
-    public function get_count($table = null, $args = [], $like = [], $limit = null, $offset = null){
+    public function get_count($table = null, $args = [], $like = [], $group_by = null, $limit = null, $offset = null){
         
         $output = false;
 
@@ -98,6 +103,11 @@ class MY_model extends CI_Model{
             }else{
                 $this->db->like($like);
             }
+        }
+
+        // group_by
+        if(! empty($group_by)){
+            $this->db->group_by($group_by); 
         }
 
         // limit & offset clause

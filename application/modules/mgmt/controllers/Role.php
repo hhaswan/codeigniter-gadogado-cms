@@ -5,8 +5,8 @@ use Carbon\Carbon;
 
 class Role extends Admin_Controller {
 
-    protected $module = "Role";
-        
+    protected $module   = "Role";
+
     public function __construct(){
         parent::__construct();
     }
@@ -21,13 +21,6 @@ class Role extends Admin_Controller {
     public function create(){
         if(! post('submit')){
             // bukan post, maka tampilkan halaman create
-
-            // ini untuk menu tambahan seperti import dll
-            /*$data['links']  = [
-                anchor(base_url('Link 1'), '<i class="fa fa-eye"></i> Lihat Entri', 'target="_blank"'),
-                anchor(base_url('Link 2'), '<i class="fa fa-eye"></i> Lihat Entri', 'target="_blank"'),
-            ];*/
-
             $data['priv']   = $this->user_priviledge;            
             $data['body']   = $this->_result_table();
             $data['title']  = "Tambah {$this->module}";
@@ -74,12 +67,13 @@ class Role extends Admin_Controller {
         if(! post('submit')){
             // bukan post, maka tampilkan halaman edit
             // get data sesuai dengan id ini
-            $id = decrypt($id_en);
-            $q  = $this->M_role->get(null, [ 'id' => $id ]);
+            $id     = decrypt($id_en);
+            $q      = $this->M_role->get(null, [ 'id' => $id ]);
 
             if(! empty($id_en) && $q){
                 $data['id']     = $id_en;
                 $data['q']      = $q;
+                $data['links']  = $this->_quick_actions($id_en);                
                 $data['priv']   = $this->user_priviledge;
                 $data['body']   = $this->_result_table();
                 $data['title']  = "Edit {$this->module}";
@@ -160,6 +154,28 @@ class Role extends Admin_Controller {
         echo $output;
     }
 
+    function _quick_actions($id){
+        // ini untuk menu tambahan seperti import dll yang digunakan disemua method
+        // bila mthod punya link yang berbeda bisa didefinisikan sendiri dimasing-masing
+        // method.
+        $links = [];
+        if($this->user_priviledge->add == 1 && method_exists($this, 'create') && access()->method != 'create'){
+            array_push(
+                $links, anchor(str_replace('/edit/'.$id, '/create', base_url(uri_string())), '<i class="fa fa-plus"></i> Entri Baru')
+            );
+        }if($this->user_priviledge->detail == 1 && method_exists($this, 'detail') && access()->method != 'detail'){
+            array_push(
+                $links, anchor(str_replace('/edit/', '/detail/', base_url(uri_string())), '<i class="fa fa-eye"></i> Detail Entri')
+            );
+        }if($this->user_priviledge->delete == 1 && method_exists($this, 'delete') && access()->method != 'delete'){
+            array_push(
+                $links, anchor(base_url(uri_string()), '<i class="fa fa-trash"></i> Hapus Entri', 'class="btn-erase-single text-red" data-url="'.base_url(uri_string().'/delete').'" data-redirect="'.str_replace('/edit/'.$id, '', base_url(uri_string())).'" data-id="'.$id.'"')
+            );
+        }
+
+        return $links;
+    }
+
     function _result_table(){
         $this->table->set_heading(
             ['data' => '<input type="checkbox" class="check-all icheck" />', 'class' => 'no-sort', 'style' => 'width:20px;'], 
@@ -174,10 +190,10 @@ class Role extends Admin_Controller {
             
             // tombol action
             $action = generate_actions([
-                /*'view'      => anchor(base_url(uri_string().'/detail/'.$row->id), '<i class="fa fa-eye"></i> Lihat Entri', 'target="_blank"'),*/
+                'detail'    => anchor(base_url(uri_string().'/detail/'.$row->id), '<i class="fa fa-eye"></i> Lihat Entri', 'target="_blank"'),
                 'edit'      => anchor(base_url(uri_string().'/edit/'.encrypt($row->id)), '<i class="fa fa-edit"></i> Edit Entri', 'target="_blank"'),
                 'delete'    => anchor(base_url(uri_string()), '<i class="fa fa-trash"></i> Hapus Entri', 'class="btn-erase-single text-red" data-url="'.base_url(uri_string().'/delete').'" data-id="'.encrypt($row->id).'"'),
-            ], $this->user_priviledge);
+            ], $this->user_priviledge, $this);
 
             $this->table->add_row(
                 ['data' => '<input type="checkbox" class="icheck check-all-child" data-id="'.encrypt($row->id).'" />'],

@@ -5,7 +5,7 @@
         <div class="box box-primary">
             <div class="box-header with-border">
                 <div class="box-title pull-left btn-group">
-                    <a href="{{ str_replace('/edit/'.$id, '', base_url(uri_string())) }}" class="btn btn-primary btn-sm">
+                    <a href="{{ str_replace('/detail/'.$id, '', base_url(uri_string())) }}" class="btn btn-primary btn-sm">
                         <i class="fa fa-arrow-left"></i> <span class="hidden-xs"> Management Data</span>
                     </a>
                 </div>
@@ -25,10 +25,12 @@
                 </div>
             </div>
                 <div class="box-body">
-                    <div class="col-lg-7">
-                        @if(flash('MSG_ERROR'))
-                            <div class="text-danger text-center">{{flash('MSG_ERROR')}}</div>
-                        @endif
+                    <div class="col-lg-8">
+                        <h4 class="text-bold">Daftar Access</h4>
+                        <p class="text-justify">Apabila terdapat access yang belum tersdia di tabel di bawah ini, dapat Anda update menggunakan fitur update entri.</p>
+                        {{ $body }}
+                    </div>
+                    <div class="col-lg-4">
                         <form method="post" action="{{ base_url(uri_string()) }}" enctype="multipart/form-data">
                             <input type="hidden" value="_patch" name="method" />
                             <div class="form-group">
@@ -49,21 +51,7 @@
                                     {{ ($q[0]->type == 'S') ? 'System' : 'Application' }}
                                 </h5>
                             </div>
-                            <div class="form-group">
-                                <label>Upload File Update Module</label>
-                                <input type="file" name="new_module" class="form-control" accept=".zip,application/x-zip,application/zip,application/x-zip-compressed,application/s-compressed,multipart/x-zip" required/>
-                                <p class="help-block">Maksimal: <b>{{ ini_get('upload_max_filesize') }}</b>, Format: <b>ZIP</b></p>
-                            </div>
-                            <div class="form-group text-right">
-                                <button type="submit" class="btn btn-primary" name="submit" value="submit">
-                                    Simpan
-                                </button>
-                            </div>
                         </form>
-                    </div>
-                    <div class="col-lg-5">
-                        <h4 class="text-bold">Petunjuk:</h4>
-                        <p>Edit beberapa informasi di samping untuk melakukan perubahan terhadap data ini.</p>
                     </div>
                 </div>
             </div>

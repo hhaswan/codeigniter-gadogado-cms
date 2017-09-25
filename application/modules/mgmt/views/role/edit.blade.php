@@ -10,10 +10,17 @@
                     </a>
                 </div>
                 <div class="box-title pull-right btn-group">
-                    @if($priv->add)
-                    <a href="{{ str_replace('/edit/'.$id, '/create', base_url(uri_string())) }}" class="btn btn-primary btn-sm">
-                        <i class="fa fa-plus"></i> <span class="hidden-xs">Tambah Data</span>
-                    </a>
+                    @if(isset($links))
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa fa-ellipsis-v"></i>&nbsp;<span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                            @foreach($links as $row)
+                                <li>{{ $row }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
                     @endif
                 </div>
             </div>
@@ -32,7 +39,7 @@
                                 <label>Alias Role (lowercase)</label>
                                 <input type="text" class="form-control" name="alias" placeholder="Alias Role; e.g: writer" value="{{ $q[0]->alias }}">
                             </div>
-                            <div class="form-group pull-right">
+                            <div class="form-group text-right">
                                 <button type="submit" class="btn btn-primary" name="submit" value="submit">
                                     Simpan
                                 </button>

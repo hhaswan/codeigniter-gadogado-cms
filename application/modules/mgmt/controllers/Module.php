@@ -5,7 +5,7 @@ use Carbon\Carbon;
 
 class Module extends Admin_Controller {
 
-    protected $module = "Module";
+    protected $module = "Module"; 
         
     public function __construct(){
         parent::__construct();
@@ -203,19 +203,66 @@ class Module extends Admin_Controller {
         }
     }
 
+    public function detail($id_en){
+        // get data sesuai dengan id ini        
+        $id     = decrypt($id_en);
+        $q      = $this->M_module->get(null, [ 'id' => $id ]);
+        
+        if(! empty($id_en) && $q){
+            
+            // heading table
+            $this->table->set_heading(
+                ['data' => 'No', 'class' => 'text-center', 'style' => 'width:8%;'],
+                ['data' => 'ID Controller', 'class' => 'text-center'],         
+                ['data' => 'ID Method / Access', 'class' => 'text-center']
+            );
+            
+            // contoller dari result access
+            $cur_ctrl   = null;
+            $access     = $this->M_module->get('app_access', [ 'app_modules_id' => $id ]);
+            foreach($access as $key => $row){
+                if($cur_ctrl != $row->class_name){
+                    $cur_ctrl = $row->class_name;
+
+                    // buat rowspan baru
+                    $this->table->add_row(
+                        ['data' => strtoupper("CLASS: {$row->class_name}"), 'class' => 'text-bold bg-red text-center', 'colspan' => 3],
+                        ['data' => "", 'class' => 'hidden'],
+                        ['data' => "", 'class' => 'hidden']                    
+                    );
+                }
+                $this->table->add_row(
+                    ['data' => ++$key, 'class' => 'text-center'],
+                    ['data' => strtolower($row->class_name), 'class' => 'text-center'],
+                    ['data' => strtolower($row->access_name), 'class' => 'text-center']
+                );
+            }
+
+            $data['id']     = $id_en;
+            $data['q']      = $q;
+            $data['body']   = generate_table();
+            $data['priv']   = $this->user_priviledge;  
+            $data['links']  = $this->_quick_actions($id_en);            
+            $data['title']  = "Detail {$this->module}";
+            $this->slice->view('module.detail', $data);
+        }
+    }
+
     public function edit($id_en){
         if(! post('submit')){
             // bukan post, maka tampilkan halaman edit
-            // get data sesuai dengan id ini
-            $id = decrypt($id_en);
-            $q  = $this->M_module->get(null, [ 'id' => $id ]);
 
+            // get data sesuai dengan id ini        
+            $id     = decrypt($id_en);
+            $q      = $this->M_module->get(null, [ 'id' => $id ]);
+            
             if(! empty($id_en) && $q){
                 // refresh access untuk modul ini
                 $data['id']     = $id_en;
                 $data['q']      = $q;
                 $data['priv']   = $this->user_priviledge;
                 $data['body']   = $this->_result_table();
+                $data['links']  = $this->_quick_actions($id_en);                
                 $data['title']  = "Edit {$this->module}";
                 $this->slice->view('module.edit', $data);
             }
@@ -334,6 +381,7 @@ class Module extends Admin_Controller {
                 foreach($id as $row){
                     if(! in_array(decrypt($row), $guarded)){
                         if($this->M_module->delete(null, [ 'id' => decrypt($row) ])){
+                            $this->_delete_files($mod_path.DS.$row);
                             $success = true;
                         }
                     }
@@ -341,6 +389,7 @@ class Module extends Admin_Controller {
             }else{
                 if(! in_array(decrypt($id), $guarded)){
                     if($this->M_module->delete(null, [ 'id' => decrypt($id) ])){
+                        $this->_delete_files($mod_path.DS.$id);
                         $success = true;
                     }
                 }
@@ -349,12 +398,33 @@ class Module extends Admin_Controller {
             if($success){
                 // hapus di folder module untuk id ini
                 $mod_path   = APPPATH.'modules';
-                $this->_delete_files($mod_path.DS.$id);
                 $output = json_encode([ 'status' => true, 'html' => $this->_result_table() ]);
             }
         }
 
         echo $output;
+    }
+
+    function _quick_actions($id){
+        // ini untuk menu tambahan seperti import dll yang digunakan disemua method
+        // bila mthod punya link yang berbeda bisa didefinisikan sendiri dimasing-masing
+        // method.
+        $links = [];
+        if($this->user_priviledge->add == 1 && method_exists($this, 'create') && access()->method != 'create'){            
+            array_push(
+                $links, anchor(str_replace('/edit/'.$id, '/create', base_url(uri_string())), '<i class="fa fa-plus"></i> Entri Baru')
+            );
+        }if($this->user_priviledge->detail == 1 && method_exists($this, 'detail') && access()->method != 'detail'){            
+            array_push(
+                $links, anchor(str_replace('/edit/', '/detail/', base_url(uri_string())), '<i class="fa fa-eye"></i> Detail Entri')
+            );
+        }if($this->user_priviledge->delete == 1 && method_exists($this, 'delete') && access()->method != 'delete'){
+            array_push(
+                $links, anchor(base_url(uri_string()), '<i class="fa fa-trash"></i> Hapus Entri', 'class="btn-erase-single text-red" data-url="'.base_url(uri_string().'/delete').'" data-redirect="'.str_replace('/edit/'.$id, '', base_url(uri_string())).'" data-id="'.$id.'"')
+            );
+        }
+
+        return $links;
     }
 
     function _result_table(){
@@ -372,10 +442,10 @@ class Module extends Admin_Controller {
             
             // tombol action
             $action = generate_actions([
-                'view'      => anchor(base_url(uri_string().'/detail/'.encrypt($row->id)), '<i class="fa fa-eye"></i> Lihat Entri', 'target="_blank"'),
+                'detail'    => anchor(base_url(uri_string().'/detail/'.encrypt($row->id)), '<i class="fa fa-eye"></i> Lihat Entri', 'target="_blank"'),
                 'edit'      => anchor(base_url(uri_string().'/edit/'.encrypt($row->id)), '<i class="fa fa-refresh"></i> Update Entri', 'target="_blank"'),
                 'delete'    => anchor(base_url(uri_string()), '<i class="fa fa-trash"></i> Hapus Entri', 'class="btn-erase-single text-red" data-url="'.base_url(uri_string().'/delete').'" data-id="'.encrypt($row->id).'"'),
-            ], $this->user_priviledge);
+            ], $this->user_priviledge, $this);
 
             $created_at = Carbon::parse($row->created_at)->diffForHumans();
             $type       = ($row->type == 'S') ? 'System' : 'Application';

@@ -84,24 +84,31 @@ if ( ! function_exists('generate_table')){
 * @author Dimas Wicaksono
 **/
 if ( ! function_exists('generate_actions')){
-    function generate_actions(array $option = [], $permission = null){
+    function generate_actions(array $option = [], $permission = null, $class){
         $output = [];
         $list   = null;
         foreach($option as $key => $row){
             // cek permission
             if(! empty($permission)){
                 if(isset($permission->$key)){
+
+                    // cek apakah dalam class ini (ctrl) ada method dengan key ini
+                    if(method_exists($class, $key)){
+                        if($key == 'delete'){
+                            $list .= '<li class="divider"></li><li>'.$row.'</li>';
+                        }else{
+                            $list .= '<li>'.$row.'</li>';
+                        }
+                    }
+
+                }     
+            }else{    
+                if(method_exists($class, $key)){
                     if($key == 'delete'){
                         $list .= '<li class="divider"></li><li>'.$row.'</li>';
                     }else{
                         $list .= '<li>'.$row.'</li>';
                     }
-                }     
-            }else{    
-                if($key == 'delete'){
-                    $list .= '<li class="divider"></li><li>'.$row.'</li>';
-                }else{
-                    $list .= '<li>'.$row.'</li>';
                 }
             }
         }
