@@ -10,4 +10,8 @@ class Landing extends Front_Controller {
     public function index(){
         $this->slice->view('index');
     }
+	
+	public function read(){
+        $this->slice->view('index');
+    }
 }

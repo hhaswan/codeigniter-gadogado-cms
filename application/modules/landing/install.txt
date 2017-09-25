@@ -1,1 +1,1 @@
-Landing Page|1.0.0|App
+Landing Page|1.0.1|App

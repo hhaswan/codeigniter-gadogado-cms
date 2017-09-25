@@ -222,7 +222,7 @@ class Module extends Admin_Controller {
         }elseif(post('submit') && post('method') == '_patch'){
             // validate
             $form_validate = validation([
-                ['new_module', 'Module Baru', 'xss_clean|required']
+                ['new_module', 'Module Baru', 'xss_clean']
             ]);
 
             if($form_validate){
@@ -299,9 +299,9 @@ class Module extends Admin_Controller {
                                     }
 
                                     // masukkan semua access ke dalam tabel
-                                    // if(! $this->_insert_access($mod_path.DS.$mod_name, $mod_name)){
-                                    //     $fail = true;
-                                    // }
+                                    if(! $this->_insert_access($mod_path.DS.$mod_name, $mod_name)){
+                                        $fail = true;
+                                    }
                                 }else{
                                     $fail = true;                                    
                                 }
@@ -313,7 +313,7 @@ class Module extends Admin_Controller {
                         $fail = true;
                     }
 
-                    // success
+                    // success message
                 }
             }else{
                 flash(['MSG_ERROR' => validation_errors()]);
@@ -347,6 +347,9 @@ class Module extends Admin_Controller {
             }
 
             if($success){
+                // hapus di folder module untuk id ini
+                $mod_path   = APPPATH.'modules';
+                $this->_delete_files($mod_path.DS.$id);
                 $output = json_encode([ 'status' => true, 'html' => $this->_result_table() ]);
             }
         }
@@ -450,10 +453,14 @@ class Module extends Admin_Controller {
                             'class_name'        => $ctrl_name,
                             'access_name'       => $method
                         ];
-                        
-                        $i = $this->M_module->insert('app_access', $data);
-                        if(! $i){
-                            $fail = true;
+
+                        // cek apakah access ini sudah ada atau blum
+                        // bila blum ada, maka insert
+                        if(! $this->M_module->get('app_access', $data)){
+                            $i = $this->M_module->insert('app_access', $data);
+                            if(! $i){
+                                $fail = true;
+                            }
                         }
                     }
                 }
