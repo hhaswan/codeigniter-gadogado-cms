@@ -38,7 +38,7 @@
                                 <label>Alias Role (lowercase)</label>
                                 <input type="text" class="form-control" name="alias" placeholder="Alias Role; e.g: writer">
                             </div>
-                            <div class="form-group pull-right">
+                            <div class="form-group text-right">
                                 <button type="submit" class="btn btn-primary" name="submit" value="submit">
                                     Simpan
                                 </button>

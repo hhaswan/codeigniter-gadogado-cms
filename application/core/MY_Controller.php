@@ -20,6 +20,7 @@ class MY_Controller extends MX_Controller {
 
         // models
         $this->load->model('mgmt/M_role','',TRUE);
+        $this->load->model('mgmt/M_module','',TRUE);
         $this->load->model('mgmt/M_session','',TRUE);
         $this->load->model('mgmt/M_registration','',TRUE);
         

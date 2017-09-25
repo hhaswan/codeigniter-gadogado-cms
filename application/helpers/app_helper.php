@@ -439,3 +439,69 @@ if ( ! function_exists('breadcrumb')){
 		return $array;
 	}
 }
+
+/**
+* Upload
+*
+* @return array
+* @author Dimas Wicaksono
+**/
+if(!function_exists('do_upload'))
+{
+	function do_upload($identifier = NULL, $conf = array()){
+		$status = 1;
+		$reason = NULL;
+		$CI =& get_instance();
+				
+		if(empty($identifier)){
+			return array('status' => 0, 'data' => 'Identifier should not be empty. No files uploaded');
+		}else{
+			$config['overwrite'] 			= TRUE;
+			$config['file_ext_tolower'] 	= TRUE;
+
+			// limit size file
+			if(array_key_exists('size', $conf)){
+				$config['max_size'] 		= $conf['size']; // in kB
+			}else{
+				$config['max_size'] 		= 2048;				
+			}
+
+			// default upload path
+			if(array_key_exists('path', $conf)){
+				// cek apakah ada folder ini? bila tidak ada buat foldernya
+				if(!is_dir($conf['path'])){
+					mkdir($conf['path'], 755, true);
+				}
+				$config['upload_path'] 		= $conf['path'];
+			}else{
+				// cek apakah ada folder ini? bila tidak ada buat foldernya
+				if(!is_dir('./uploads')){
+					mkdir('./uploads', 755);
+				}
+				$config['upload_path'] 		= './uploads';
+			}
+
+			// file type yang diperblehkan untuk diupload (sudah di cek mimenya juga)
+			if(array_key_exists('type', $conf)){
+				$config['allowed_types'] 	= $conf['type'];
+			}else{
+				$config['allowed_types'] 	= '*';				
+			}
+			
+			if(array_key_exists('name', $conf)){
+				$config['file_name'] 	 	= $conf['name'];
+			}else{
+				// nama file tidak ada, maka berikan nama random
+				$config['encrypt_name'] 	= TRUE;				
+			}
+			
+			$CI->load->library('upload', $config);
+			$upload = $CI->upload->do_upload($identifier);
+			if($upload){
+				return array('status' => 1, 'data' => $CI->upload->data());
+			}else{
+				return array('status' => 0, 'data' => $CI->upload->display_errors());
+			}
+		}
+	}
+}

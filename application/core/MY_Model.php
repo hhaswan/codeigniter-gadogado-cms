@@ -63,6 +63,57 @@ class MY_model extends CI_Model{
     }
 
     /**
+    * Get Entry (Count Row)
+    *
+    * @return object
+    * @author Dimas Wicaksono
+    **/
+    public function get_count($table = null, $args = [], $like = [], $limit = null, $offset = null){
+        
+        $output = false;
+
+        if(empty($table)){
+            $table = $this->table;
+        }
+        
+        // where clause
+        if(! empty($args)){            
+            $this->db->where($args);
+        }
+
+        // like clause
+        if(! empty($like)){
+            if(count($like) > 1){
+                // bila argument like lebih dari satu
+                $i = 0;
+                foreach($like as $key => $row){
+                    if($i == 0){
+                        $this->db->like($key, $row);
+                    }else{
+                        $this->db->or_like($key, $row);
+                    }
+
+                    $i++;
+                }
+            }else{
+                $this->db->like($like);
+            }
+        }
+
+        // limit & offset clause
+        if(! empty($limit)){
+            $this->db->limit($limit, $offset);
+        }
+
+        $query = $this->db->get($table);
+        if($query){
+            $output = $query->num_rows();
+        }
+
+        return $output;
+    }
+
+    /**
     * Insert Entry
     *
     * @return integer

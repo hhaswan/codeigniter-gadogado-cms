@@ -138,15 +138,15 @@ class Role extends Admin_Controller {
             // bila banyak data maka hapus satu2
             if(is_array($id)){
                 foreach($id as $row){
-                    if(! in_array($row, $guarded)){
-                        if(! $this->M_role->delete(null, [ 'id' => decrypt($row) ])){
+                    if(! in_array(decrypt($row), $guarded)){
+                        if($this->M_role->delete(null, [ 'id' => decrypt($row) ])){
                             $success = true;
                         }
                     }
                 }
             }else{
-                if(! in_array($id, $guarded)){
-                    if(! $this->M_role->delete(null, [ 'id' => decrypt($id) ])){
+                if(! in_array(decrypt($id), $guarded)){
+                    if($this->M_role->delete(null, [ 'id' => decrypt($id) ])){
                         $success = true;
                     }
                 }
