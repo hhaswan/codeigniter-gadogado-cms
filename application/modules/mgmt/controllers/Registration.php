@@ -68,9 +68,14 @@ class Registration extends Admin_Controller {
                 redirect(back());
             }
         }else{
-            // halaman register
-            $data['title'] = "Pendaftaran";
-            $this->slice->view('registration.public', $data);
+            // halaman register, bila belum login maka tampilkan
+            if(! session($this->admin_identifier)){
+                $data['title'] = "Pendaftaran";
+                $this->slice->view('registration.public', $data);
+            }else{
+                // untuk user dengan auth arahkan ke modul management user
+                redirect(base_url('mgmt/user'), 'refresh');
+            }
         }
 
     }

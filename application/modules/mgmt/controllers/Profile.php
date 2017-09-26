@@ -9,12 +9,12 @@ class Profile extends Admin_Controller {
         parent::__construct();
     }
     
-    public function index($user_id = null){
+    public function index($user_idx = null){
 
         // submit dan non submit
         if(! post('submit') && ! post('submit_password')){
             // bila user id kosong maka tampilkan datanya saja        
-            $user_id = (isset($user_id)) ? $user_id : session($this->admin_identifier)['user_id'];
+            $user_id = (isset($user_idx)) ? decrypt($user_idx) : session($this->admin_identifier)['user_id'];
             
             $result  = $this->M_session->get('app_users', [ 'id' => $user_id]);
             if($result){

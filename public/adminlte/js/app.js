@@ -123,7 +123,7 @@ $(document).on('click','.btn-erase-single',function(e){
                 data    : { id: d_id },
                 dataType: "json",
                 beforeSend: function(){
-                    if(d_rdr != '' && d_rdr !== undefined){
+                    if(d_rdr == '' && d_rdr === undefined){
                         // normal table
                         $('.overlay').fadeIn('fast');
                     }
@@ -140,7 +140,7 @@ $(document).on('click','.btn-erase-single',function(e){
                             timer: 2500
                         });
 
-                        if(d_rdr != '' && d_rdr !== undefined){
+                        if(d_rdr == '' && d_rdr === undefined){
                             $('#table-result-box').html(data.html);
                             reinitialize_datatable();
                         }else{

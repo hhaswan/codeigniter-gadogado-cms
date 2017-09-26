@@ -20,6 +20,7 @@ class MY_Controller extends MX_Controller {
 
         // models
         $this->load->model('mgmt/M_role','',TRUE);
+        $this->load->model('mgmt/M_user','',TRUE);
         $this->load->model('mgmt/M_module','',TRUE);
         $this->load->model('mgmt/M_session','',TRUE);
         $this->load->model('mgmt/M_registration','',TRUE);
@@ -141,6 +142,8 @@ class Admin_Controller extends MY_Controller {
             if(! in_array(access()->method, $this->session_exception)){
                 show_404();
             }
+        }else{
+            return true;
         }
     }
 }
