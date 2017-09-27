@@ -86,14 +86,290 @@ class User extends Admin_Controller {
         }
     }
 
-    public function import(){
-        if(! post('submit')){
+    public function import($token = null){
+        if(! post('submit') && empty($token)){
             $data['priv']   = $this->user_priviledge;
-            $data['links']  = [anchor(str_replace('/import', '/create', base_url(uri_string())), '<i class="fa fa-file"></i> Import Data')];    
+            $data['links']  = [anchor(str_replace('/import', '/create', base_url(uri_string())), '<i class="fa fa-plus"></i> Tambah Data')];
             $data['title']  = "Import {$this->module}";
-            $this->slice->view('user.import', $data);
+            $this->slice->view('commons.import', $data);
+        }elseif(post('submit')){
+            
+            $fail = false;
+            
+            // cek upload data user
+            // bila data tidak empty maka insert
+            if(! empty($_FILES['import_data']['name'])){
+                
+                $name       = 'data_import_'.random_string('alnum', 8);
+                $path       = './uploads/import/'.strtolower($this->module);
+                
+                // masukkan ke folder sementara
+                $config = [
+                    'path'  => $path,
+                    'type'  => 'xls',
+                    'name'  => $name
+                ];
+
+                $u = do_upload('import_data', $config);
+                if($u['status'] == 1){
+                    // redirect ke import_preview
+                    $link = str_replace('/import', '/import_preview/'.encrypt($name), base_url(uri_string()));
+                    redirect($link);
+                }else{
+                    $fail = true;                    
+                }
+            }else{
+                $fail = true;
+            }
+
+            /*
+            if(! $fail){
+                // success message
+                flash(['GLOBAL_ALERT_SUCCESS' => 'Data Berhasil Disimpan.']);
+                redirect(back());
+            }else{
+                // fail message 
+                flash(['GLOBAL_ALERT_FAIL' => 'Data Gagal Disimpan. Silakan coba beberapa saat lagi.']);
+                redirect(back());
+            }*/
+        }elseif($token == 'format'){
+            // generate format excel untuk import
+
+            // masukkan list field yang tidak ingin dimasukkan dalam format excel
+            $excluded   = [ 'id', 'salt', 'created_at', 'otp', 'bio' ];
+
+            // PHPExcel
+            $objPHPExcel = new PHPExcel();
+
+            // array untuk border
+            $styleArray = [ 'borders' => [ 'allborders' => [ 
+                'style' => PHPExcel_Style_Border::BORDER_THIN ] 
+                ]
+            ];
+            
+            // Buat sheet baru excel
+            $sheet = $objPHPExcel->createSheet(0);
+            $sheet->setTitle("DATA ".strtoupper($this->module));
+            $sheet->SetCellValue('A1', "FORMAT IMPORT ".strtoupper($this->module)." - ".strtoupper(app()->name)."\n".strtoupper(app()->company));
+            $sheet->getStyle('A1')->getAlignment()->setWrapText(true);
+
+            // Set sheet yang aktif
+            $objPHPExcel->setActiveSheetIndex(0);
+
+            $panjang_tabel = range('B', 'Z');
+            $sheet->SetCellValue("A2", "No");
+            $sheet->getColumnDimension("A")->setWidth(6);
+            $objPHPExcel->getActiveSheet()->getStyle("A2")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('DDDDDD');
+
+            // Example for audiences
+            $sheet->SetCellValue("A3", 1);
+
+            // get field dan meta field pada tabel ini
+            $example = [ 'user@example.com', 'password', 'User', 'Aktif', 'John Doe' ];
+
+            $i = 0;
+            $q = $this->M_user->get_field_data(null);
+            foreach($q as $key => $row){
+                if(! in_array($row->name, $excluded)){
+                    $sheet->SetCellValue("{$panjang_tabel[$i]}2", strtoupper(humanize($row->name)));
+                    
+                    // Example for audiences
+                    $sheet->SetCellValue("{$panjang_tabel[$i]}3", $example[$i]);
+                    
+                    $objPHPExcel->getActiveSheet()->getColumnDimension($panjang_tabel[$i])->setAutoSize(true);
+                    $objPHPExcel->getActiveSheet()->getStyle("{$panjang_tabel[$i]}2")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('DDDDDD');
+                    $i++;
+                }
+            }
+
+            // border untuk tabel data
+            $akhir = ($i-1);
+            $objPHPExcel->getActiveSheet()->getStyle("A2:{$panjang_tabel[$akhir]}20")->applyFromArray($styleArray);                        
+            
+            ////////////////////// TABLE REFERENSI //////////////////////
+            // get data role sebagai referensi
+            $i++;
+            $awal = "{$panjang_tabel[$i]}2";            
+            $sheet->SetCellValue("{$panjang_tabel[$i]}2", "Referensi APP ROLE ID");
+            $objPHPExcel->getActiveSheet()->getColumnDimension($panjang_tabel[$i])->setAutoSize(true);
+            $objPHPExcel->getActiveSheet()->getStyle("{$panjang_tabel[$i]}2")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('DDDDDD');            
+
+            $no = 3;
+            $r  = $this->M_role->get(null, []);
+            foreach($r as $row){
+                $sheet->SetCellValue("{$panjang_tabel[$i]}{$no}", $row->name);
+                $no++;
+            }
+
+            // border
+            $akhir = ($no-1);
+            $objPHPExcel->getActiveSheet()->getStyle("{$awal}:{$panjang_tabel[$i]}{$akhir}")->applyFromArray($styleArray);            
+
+            // status user
+            $no++;
+            $awal = $panjang_tabel[$i].$no;
+            $sheet->SetCellValue("{$panjang_tabel[$i]}{$no}", "Referensi STATUS");
+            $objPHPExcel->getActiveSheet()->getColumnDimension($panjang_tabel[$i])->setAutoSize(true);
+            $objPHPExcel->getActiveSheet()->getStyle("{$panjang_tabel[$i]}{$no}")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('DDDDDD');
+            $sheet->getStyle("{$panjang_tabel[$i]}{$no}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle("{$panjang_tabel[$i]}{$no}")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            $sheet->getStyle("{$panjang_tabel[$i]}{$no}")->getFont()->setBold(true);            
+
+            $status = [ 'Non-Aktif', 'Aktif', 'Pending' ];
+            foreach($status as $row){
+                $no++;   
+                $sheet->SetCellValue("{$panjang_tabel[$i]}{$no}", $row);
+            }
+
+            $akhir = ($no + 2);
+            $sheet->SetCellValue("{$panjang_tabel[$i]}{$akhir}", "*) Hapus data Contoh!");
+            
+            // border
+            $objPHPExcel->getActiveSheet()->getStyle("{$awal}:{$panjang_tabel[$i]}{$no}")->applyFromArray($styleArray);
+            ////////////////////// END TABLE REFERENSI //////////////////////            
+
+            // marge cell haeder
+            $sheet->getStyle("A1:{$panjang_tabel[$i]}2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle("A1:{$panjang_tabel[$i]}2")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);       
+            $sheet->getStyle("A1:{$panjang_tabel[$i]}2")->getFont()->setBold(true);
+            $sheet->mergeCells("A1:{$panjang_tabel[$i]}1");
+            
+            $objPHPExcel->getActiveSheet()->getStyle("A1:{$panjang_tabel[$i]}1")->applyFromArray($styleArray);
+                    
+            // Set file properties
+            $filename 	= "FORMAT IMPORT ".strtoupper($this->module)." - ".strtoupper(app()->name).".xls";
+            $objPHPExcel->getProperties()->setTitle($filename);
+            $objPHPExcel->getProperties()->setCreator("[DW] ".ucwords(app()->name).' by '.ucwords(app()->company));
+            $objPHPExcel->getProperties()->setDescription("This file intended to use on ".ucwords(app()->name).' ecosystems only.');
+            $objWriter 	= new PHPExcel_Writer_Excel5($objPHPExcel);
+            
+            header('Content-Type: application/vnd.ms-excel');
+            header('Content-Disposition: attachment;filename="'.$filename.'"');
+            header('Cache-Control: max-age=0');	
+            
+            $objWriter->save('php://output');
+            exit();
+        }
+    }
+
+    public function import_preview($id_en){
+        
+        $fail   = false;
+        $id     = decrypt($id_en);
+        $path   = './uploads/import/'.strtolower($this->module).'/'.$id.'.xls';
+
+        if(! post('submit')){
+            // cek apakah file ada diserver atau tidak
+            if(! empty($id_en) && is_file($path)){
+                
+                $error      = 0;
+                $range      = 'A';
+                $field      = [];
+                $valid_id   = [];
+
+                // dapatkan field dari tabel ini
+                $q = $this->M_user->get_field_data(null);
+                foreach($q as $row){
+                    if(! in_array($row->name, [ 'id', 'salt', 'created_at', 'otp', 'bio' ])){
+                        array_push($field, $row->name);
+                        $range++;
+                    }
+                }
+
+                // karena data_row_status tidak masuk dalam list field tabel
+                // dan kolom ini digunakan untuk menandai row bermasalah atau tidak
+                array_push($field, 'data_row_status');
+                
+                // untuk kolom head nomor
+                $data_head = [
+                    ['data' => 'No', 'class' => 'text-center', 'style' => 'width:8%;']                    
+                ];
+
+                // temporary read data dari excelnya
+                $a = excel_reader($path, $range, 3, [ 'app_role_id', 'status', 'email' ], [ 'no' ]);
+                foreach($a as $key => $row){
+
+                    $row_invalid = false;
+
+                    $data_row    = [
+                        ['data' => ++$key, 'class' => 'text-center'],
+                    ];
+
+                    // dapatkan list field dari table yang dingunakan untuk import data
+                    foreach($field as $row_field){
+                        // table heading untuk pertama saja
+                        if($key == 1){
+                            if($row_field != 'data_row_status'){
+                                array_push($data_head, ['data' => ucwords($row_field), 'class' => 'text-center']);
+                            }
+                        }
+                        
+                        // cek apakah ini kolom untuk remarks atau keterangan?
+                        if($row_field == 'data_row_status'){
+                            if($row->$row_field == 1 && ! $row_invalid){
+                                $valid = '<label class="label label-success">VALID</label>';
+
+                                // masukkan key yang valid
+                                array_push($valid_id, ($key - 1));
+                            }else{
+                                $valid = '<label class="label label-danger">INVALID</label>';
+                                $error++;
+                            }
+                            array_push($data_row, ['data' => $valid, 'class' => 'text-center']);
+                        }else{
+                            // bila error, set background jadi merah
+                            if($row->$row_field == '#__ERROR__#'){
+                                array_push($data_row, ['data' => 'ERROR!', 'class' => 'text-center bg-red']);
+                                $row_invalid = true;
+                            }elseif($row_field == 'email' && $this->M_user->get(null, [ 'email' => $row->$row_field ])){
+                                array_push($data_row, ['data' => $row->$row_field, 'class' => 'text-center bg-red']);
+                                $row_invalid = true;
+                            }else{
+                                array_push($data_row, ['data' => $row->$row_field, 'class' => 'text-center']);                                
+                            }
+                        }
+                    }
+
+                    // masukkan dalam row baru untuk tabel di view
+                    $this->table->add_row($data_row);
+                }
+
+                // finishing header tabel
+                array_push($data_head, ['data' => 'Remark', 'class' => 'text-center', 'style' => 'width:14%;']);                        
+                $this->table->set_heading($data_head);
+                
+                // data session untuk modul ini
+                $data_sess_mod = [
+                    'valid_id'  => $valid_id,
+                    'max_range' => $range,
+                    'fields'    => $field
+                ];
+
+                // TODO: ubah jadi flash!
+                // masukkan dalam session valid id
+                session(['mod_'.$this->module => $data_sess_mod ]);
+
+                $data['rows']   = count($a);
+                $data['error']  = $error;
+                $data['body']   = generate_table();
+                $data['title']  = "Preview Import {$this->module}";
+                $this->slice->view('commons.import_preview', $data);
+            }
         }else{
-            // post
+            // cek apakah file ada diserver atau tidak
+            if(! empty($id_en) && is_file($path)){
+                $data_sess_mod = session('mod_'.$this->module);
+                $excel      = excel_reader($path, $data_sess_mod['max_range'], 3, [ 'app_role_id', 'status', 'email' ], [ 'no' ]);
+                
+                print_r($data_sess_mod['fields']);
+
+                // bandingkan data excel dengan id valid saja
+                foreach($excel as $key => $row){
+                    if(in_array($key, $data_sess_mod['valid_id'])){
+                        echo $row->email;
+                    }
+                }
+            }
         }
     }
 

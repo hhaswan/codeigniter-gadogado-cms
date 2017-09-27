@@ -360,7 +360,15 @@ class Module extends Admin_Controller {
                         $fail = true;
                     }
 
-                    // success message
+                    if(! $fail){
+                        // success message
+                        flash(['GLOBAL_ALERT_SUCCESS' => 'Data Berhasil Disimpan.']);
+                        redirect(back());
+                    }else{
+                        // fail message 
+                        flash(['GLOBAL_ALERT_FAIL' => 'Data Gagal Disimpan. Silakan coba beberapa saat lagi.']);
+                        redirect(back());
+                    }
                 }
             }else{
                 flash(['MSG_ERROR' => validation_errors()]);

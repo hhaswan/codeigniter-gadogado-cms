@@ -29,26 +29,17 @@
                         @if(flash('MSG_ERROR'))
                             <div class="text-danger text-center">{{flash('MSG_ERROR')}}</div>
                         @endif
-                        <form method="post" action="{{ base_url(uri_string()) }}">
-                            <div class="form-group has-feedback">
-                                <label for="nama">Nama Lengkap <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="nama" name="nama" placeholder="Nama Lengkap" required>
-                                <span class="fa fa-user form-control-feedback"></span>
+                        <form method="post" action="{{ base_url(uri_string()) }}" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label>Format Import</label>
+                                <h5 class="text-primary text-bold" style="margin:0px;">
+                                    <a href="{{ base_url(uri_string().'/format') }}"><i class="fa fa-file-excel-o"></i> DOWNLOAD FORMAT</a>
+                                </h5>
                             </div>
-                            <div class="form-group has-feedback">
-                                <label for="email">Email <span class="text-danger">*</span></label>
-                                <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
-                                <span class="fa fa-envelope form-control-feedback"></span>
-                            </div>
-                            <div class="form-group has-feedback">
-                                <label for="password">Password <span class="text-danger">*</span></label>            
-                                <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
-                                <span class="fa fa-lock form-control-feedback"></span>
-                            </div>
-                            <div class="form-group has-feedback">
-                                <label for="password_confirmation">Konfirmasi Password <span class="text-danger">*</span></label>
-                                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Konfirmasi Password" required>
-                                <span class="fa fa-lock form-control-feedback"></span>
+                            <div class="form-group">
+                                <label>Upload File Untuk Diimport</label>
+                                <input type="file" name="import_data" class="form-control" accept=".xls,application/vnd.ms-excel,application/msexcel,application/x-msexcel,application/x-ms-excel,application/x-excel,application/x-dos_ms_excel,application/xls,application/x-xls,application/excel,application/download,application/vnd.ms-office,application/msword" required/>
+                                <p class="help-block">Maksimal: <b>{{ ini_get('upload_max_filesize') }}</b>, Format: <b>XLS</b></p>
                             </div>
                             <div class="form-group text-right">
                                 <button type="submit" class="btn btn-primary" name="submit" value="submit">
@@ -59,7 +50,8 @@
                     </div>
                     <div class="col-lg-5">
                         <h4 class="text-bold">Petunjuk:</h4>
-                        <p>Lengkapilah form yang diperlukan di sebelah untuk dapat membuat data baru.</p>
+                        <p class="text-justify">Untuk meng-import data, silakan download format excel yang tersedia kemudian masukkan data yang ingin di-import 
+                        sesuai dengan format yang telah ditentukan.</p>
                     </div>
                 </div>
             </div>

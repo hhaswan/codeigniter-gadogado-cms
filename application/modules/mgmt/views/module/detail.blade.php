@@ -31,27 +31,24 @@
                         {{ $body }}
                     </div>
                     <div class="col-lg-4">
-                        <form method="post" action="{{ base_url(uri_string()) }}" enctype="multipart/form-data">
-                            <input type="hidden" value="_patch" name="method" />
-                            <div class="form-group">
-                                <label>Nama Module</label>
-                                <h4 class="text-primary text-bold" style="margin:0px;">
-                                    {{ strtoupper($q[0]->name) }}
-                                </h4>
-                            </div>
-                            <div class="form-group">
-                                <label>Versi &amp; Tanggal Install Module</label>
-                                <h5 class="text-primary text-bold" style="margin:0px;">
-                                    {{ "v{$q[0]->version}" }} | {{ \Carbon\Carbon::parse($q[0]->created_at)->diffForHumans(); }}
-                                </h5>
-                            </div>
-                            <div class="form-group">
-                                <label>Tipe Module</label>
-                                <h5 class="text-primary text-bold" style="margin:0px;">
-                                    {{ ($q[0]->type == 'S') ? 'System' : 'Application' }}
-                                </h5>
-                            </div>
-                        </form>
+                        <div class="form-group">
+                            <label>Nama Module</label>
+                            <h4 class="text-primary text-bold" style="margin:0px;">
+                                {{ strtoupper($q[0]->name) }}
+                            </h4>
+                        </div>
+                        <div class="form-group">
+                            <label>Versi &amp; Tanggal Install Module</label>
+                            <h5 class="text-primary text-bold" style="margin:0px;">
+                                {{ "v{$q[0]->version}" }} | {{ \Carbon\Carbon::parse($q[0]->created_at)->diffForHumans(); }}
+                            </h5>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipe Module</label>
+                            <h5 class="text-primary text-bold" style="margin:0px;">
+                                {{ ($q[0]->type == 'S') ? 'System' : 'Application' }}
+                            </h5>
+                        </div>
                     </div>
                 </div>
             </div>

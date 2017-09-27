@@ -124,6 +124,25 @@ class MY_model extends CI_Model{
     }
 
     /**
+    * Get Entry (Count Row)
+    *
+    * @return object
+    * @author Dimas Wicaksono
+    **/
+    public function get_field_data($table = null){
+        
+        $output = false;
+
+        if(empty($table)){
+            $table = $this->table;
+        }
+
+        $output = $this->db->field_data($table);
+
+        return $output;
+    }
+
+    /**
     * Insert Entry
     *
     * @return integer

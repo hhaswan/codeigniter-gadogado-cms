@@ -121,6 +121,73 @@ if ( ! function_exists('generate_actions')){
 }
 
 /**
+* Excel Import Reader
+*
+* @return array
+* @author Dimas Wicaksono
+**/
+if ( ! function_exists('excel_reader')){
+    function excel_reader($path, $max_column, $start_row = 3, array $mandatory_list = [], array $ignore_list = []){
+
+        $output = [];
+        
+        // baca excel file yang ada dalam server
+        $excelReader    = PHPExcel_IOFactory::createReaderForFile($path);
+        $excelObj       = $excelReader->load($path);
+        $sheet          = $excelObj->getSheet(0);
+
+        // kolom palng bawah yang kemungkinan ada data
+        $highestRow     = $sheet->getHighestRow();
+        $filledCol      = range('A', $max_column);
+
+        for ($row = $start_row; $row <= $highestRow; $row++) { 
+            
+            // rerset data baris
+            $data           = [];
+
+            // cek row yang ada errornya
+            $row_status     = 1;
+
+            // dimulai dari 1 krn nomor tidak dianggap
+            $empty_value    = count($ignore_list);
+
+            // dapatkan data di tiap kolom sesuai dengan parameter
+            foreach($filledCol as $row_col){
+                $header = url_title(strtolower($sheet->getCell($row_col."2")->getValue()), 'underscore');
+                $value  = $sheet->getCell($row_col.$row)->getValue();
+                
+                // bila tidak kosong, masukkan data
+                if(! in_array($header, $ignore_list)){
+                    if(! empty($value)){
+                        $data += [ $header => $value ];
+                    }elseif(empty($value) && in_array($header, $mandatory_list)){
+                        // kosong dan termasuk mandatory
+                        $data += [ $header => '#__ERROR__#' ];
+                        $empty_value++;
+                        $row_status = 0;
+                    }else{
+                        // kosong tidak termasuk mandatory
+                        $data += [ $header => null ];
+                        $empty_value++;
+                    }
+                }
+
+                // bila row kosong semua (berarti tidak ada data yang diinput di row ini)
+                if($empty_value >= count($filledCol)){
+                    $data = [];
+                }
+            }
+            if(! empty($data)){
+                $data += [ 'data_row_status' => $row_status ];
+                array_push($output, (object) $data);
+            }
+        }
+        
+        return $output;
+    }
+}
+
+/**
 * Send Email
 *
 * @return boolean
