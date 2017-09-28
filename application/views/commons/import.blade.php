@@ -5,7 +5,7 @@
         <div class="box box-primary">
             <div class="box-header with-border">
                 <div class="box-title pull-left btn-group">
-                    <a href="{{ str_replace('/create', '', base_url(uri_string().'/create')) }}" class="btn btn-primary btn-sm">
+                    <a href="{{ str_replace('/import', '', base_url(uri_string())) }}" class="btn btn-primary btn-sm">
                         <i class="fa fa-arrow-left"></i> <span class="hidden-xs"> Management Data</span>
                     </a>
                 </div>

@@ -122,16 +122,10 @@ class User extends Admin_Controller {
                 $fail = true;
             }
 
-            /*
-            if(! $fail){
-                // success message
-                flash(['GLOBAL_ALERT_SUCCESS' => 'Data Berhasil Disimpan.']);
-                redirect(back());
-            }else{
-                // fail message 
+            if($fail){
                 flash(['GLOBAL_ALERT_FAIL' => 'Data Gagal Disimpan. Silakan coba beberapa saat lagi.']);
                 redirect(back());
-            }*/
+            }
         }elseif($token == 'format'){
             // generate format excel untuk import
 
@@ -300,7 +294,7 @@ class User extends Admin_Controller {
                         // table heading untuk pertama saja
                         if($key == 1){
                             if($row_field != 'data_row_status'){
-                                array_push($data_head, ['data' => ucwords($row_field), 'class' => 'text-center']);
+                                array_push($data_head, ['data' => ucwords(humanize($row_field)), 'class' => 'text-center']);
                             }
                         }
                         
@@ -324,6 +318,12 @@ class User extends Admin_Controller {
                             }elseif($row_field == 'email' && $this->M_user->get(null, [ 'email' => $row->$row_field ])){
                                 array_push($data_row, ['data' => $row->$row_field, 'class' => 'text-center bg-red']);
                                 $row_invalid = true;
+                            }elseif($row_field == 'app_role_id' && ! $this->M_role->get(null, [ 'name' => $row->$row_field ])){
+                                array_push($data_row, ['data' => $row->$row_field, 'class' => 'text-center bg-red']);
+                                $row_invalid = true;
+                            }elseif($row_field == 'status' && ! in_array($row->$row_field, [ 'Aktif', 'Non-Aktif', 'Pending' ])){
+                                array_push($data_row, ['data' => $row->$row_field, 'class' => 'text-center bg-red']);
+                                $row_invalid = true;
                             }else{
                                 array_push($data_row, ['data' => $row->$row_field, 'class' => 'text-center']);                                
                             }
@@ -345,12 +345,12 @@ class User extends Admin_Controller {
                     'fields'    => $field
                 ];
 
-                // TODO: ubah jadi flash!
                 // masukkan dalam session valid id
-                session(['mod_'.$this->module => $data_sess_mod ]);
+                flash(['mod_'.$this->module => $data_sess_mod ]);
 
                 $data['rows']   = count($a);
                 $data['error']  = $error;
+                $data['id']     = $id_en;
                 $data['body']   = generate_table();
                 $data['title']  = "Preview Import {$this->module}";
                 $this->slice->view('commons.import_preview', $data);
@@ -358,16 +358,79 @@ class User extends Admin_Controller {
         }else{
             // cek apakah file ada diserver atau tidak
             if(! empty($id_en) && is_file($path)){
-                $data_sess_mod = session('mod_'.$this->module);
-                $excel      = excel_reader($path, $data_sess_mod['max_range'], 3, [ 'app_role_id', 'status', 'email' ], [ 'no' ]);
+                $jumlah_insert  = 0;
+                $data_sess_mod  = flash('mod_'.$this->module);
+                $excel          = excel_reader($path, $data_sess_mod['max_range'], 3, [ 'app_role_id', 'status', 'email' ], [ 'no' ]);
                 
-                print_r($data_sess_mod['fields']);
-
                 // bandingkan data excel dengan id valid saja
                 foreach($excel as $key => $row){
+                    $is_valid = true;
+
                     if(in_array($key, $data_sess_mod['valid_id'])){
-                        echo $row->email;
+                        $data = [ 'created_at' => Carbon::now() ];
+                        foreach($data_sess_mod['fields'] as $row_field){
+                            if($row_field == 'email'){
+                                if($this->M_user->get(null, [ 'email' => $row->$row_field ])){
+                                    $is_valid = false;
+                                }
+                            }
+                            if($row_field != 'data_row_status'){
+                                switch($row_field){
+                                    case "password":
+                                        $salt       = random_string('alnum', 128);
+                                        $password   = hash("sha512", $row->$row_field.$salt, FALSE);
+                                        $data       += [ $row_field => $password ];
+                                        $data       += [ 'salt' => $salt ];
+                                        break;
+                                    case "app_role_id":
+                                        $r = $this->M_role->get(null, [ 'name' => $row->$row_field ]);
+                                        if($r){
+                                            $data       += [ $row_field => $r[0]->id ];
+                                        }else{
+                                            $is_valid = false;
+                                        }
+                                        break;
+                                    case "status":
+                                        if($row->$row_field == 'Aktif'){
+                                            $sts = 1;
+                                        }elseif($row->$row_field == 'Non-Aktif'){
+                                            $sts = 0;                                            
+                                        }elseif($row->$row_field == 'Pending'){
+                                            $sts = 2;                                            
+                                        }else{
+                                            $is_valid = false;
+                                        }
+                                        $data       += [ $row_field => $sts ];
+                                        break;
+                                    default:
+                                        $data       += [ $row_field => $row->$row_field ];                                
+                                        break;
+                                }
+                            }
+                        }
+
+                        // insert bila valid
+                        if($is_valid){
+                            $i = $this->M_user->insert(null, $data);
+                            if($i){
+                                $jumlah_insert++;
+                            }
+                        }
+
                     }
+                }
+
+                // delete file diserver
+                unlink($path);
+
+                if($jumlah_insert > 0){
+                    // success message
+                    flash(['GLOBAL_ALERT_SUCCESS' => $jumlah_insert.'/'.count($data_sess_mod['valid_id']).' Data Berhasil Disimpan.']);
+                    redirect(str_replace('/import_preview/'.$id_en, '', base_url(uri_string())));
+                }else{
+                    // fail message 
+                    flash(['GLOBAL_ALERT_FAIL' => 'Data Gagal Disimpan. Silakan coba beberapa saat lagi.']);
+                    redirect(str_replace('/import_preview/'.$id_en, '/import', base_url(uri_string())));
                 }
             }
         }
@@ -493,6 +556,22 @@ class User extends Admin_Controller {
 
             if($success){
                 $output = json_encode([ 'status' => true, 'html' => $this->_result_table() ]);
+            }
+        }
+
+        echo $output;
+    }
+
+    public function delete_import(){
+        // masukkan id yang tidak ingin dihapus
+        $success    = false;
+        if($this->request_method_delete && ! empty($id = $this->request_data['id'])){
+            // bila banyak data maka hapus satu2
+            $path   = './uploads/import/'.strtolower($this->module).'/'.$id.'.xls';
+
+            if(is_file($path)){
+                // delete file diserver
+                unlink($path);
             }
         }
 

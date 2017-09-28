@@ -19,7 +19,7 @@
                             </div>
                             @if($error < $rows)
                             <div class="form-group text-right">
-                                <button type="submit" class="btn btn-primary" name="submit" value="submit">
+                                <button type="submit" class="btn btn-primary" id="btn-submit" name="submit" value="submit">
                                     Lanjutkan &amp; Simpan
                                 </button>
                             </div>
@@ -49,6 +49,24 @@
 
 @section('custom_js')
 <script>
-
+var is_submit = false;
+$('#btn-submit').click(function(){
+    is_submit = true;
+});
+$(window).bind('beforeunload', function(e) {
+    if(! is_submit){
+        return "Do you really want to close?";
+    }
+});
+$(window).on('unload', function() {
+    if(! is_submit){
+        $.ajax({
+            url     : "{{ str_replace("import_preview/".$id, "delete_import", base_url(uri_string())) }}",
+            type    : "delete",
+            data    : { id: "{{ decrypt($id) }}" },
+            async   : false
+        }); 
+    }
+});
 </script>
 @endsection
