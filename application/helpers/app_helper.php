@@ -230,13 +230,13 @@ if ( ! function_exists('send_email')){
 }
 
 /**
-* Encrypt
+* Complex Encrypt
 *
 * @return string
 * @author Dimas Wicaksono
 **/
-if ( ! function_exists('encrypt')){
-    function encrypt($string){
+if ( ! function_exists('complex_encrypt')){
+    function complex_encrypt($string){
         $CI =& get_instance();
         
         $CI->encryption->initialize(array('cipher' => 'tripledes', 'mode' => 'cbc'));
@@ -249,13 +249,61 @@ if ( ! function_exists('encrypt')){
 }
 
 /**
-* Decrypt
+* Simple Encrypt
+*
+* @return string
+* @author Dimas Wicaksono
+**/
+if ( ! function_exists('encrypt')){
+    function encrypt($string) {
+        // you may change these values to your own
+        $secret_key     = url_title(app()->name);
+        $secret_iv      = url_title(app()->company);
+    
+        $output         = false;
+        $encrypt_method = "AES-256-CBC";
+        $key    = hash('sha256', $secret_key);
+        $iv     = substr(hash('sha256', $secret_iv), 0, 16);
+
+        $str    = base64_encode(openssl_encrypt($string, $encrypt_method, $key, 0, $iv));
+        $output = str_replace(array('+', '/', '='), array('-', '_', '~'), $str);
+        
+        return $output;
+    }
+}
+
+/**
+* Simple Decrypt
 *
 * @return string
 * @author Dimas Wicaksono
 **/
 if ( ! function_exists('decrypt')){
-    function decrypt($string){
+    function decrypt($string) {
+        // you may change these values to your own
+        $secret_key     = url_title(app()->name);
+        $secret_iv      = url_title(app()->company);
+    
+        $output         = false;
+        $encrypt_method = "AES-256-CBC";
+        $key    = hash('sha256', $secret_key);
+        $iv     = substr(hash('sha256', $secret_iv), 0, 16);
+
+        $str    = str_replace(array('-', '_', '~'), array('+', '/', '='), $string);
+        $output = openssl_decrypt(base64_decode($str), $encrypt_method, $key, 0, $iv);
+        
+        return $output;
+    }
+}
+
+/**
+* Complex Decrypt
+*
+* @return string
+* @author Dimas Wicaksono
+**/
+if ( ! function_exists('complex_decrypt')){
+    function complex_decrypt($string){
         $CI =& get_instance();
 		
 		$CI->encryption->initialize(array('cipher' => 'tripledes','mode' => 'cbc'));

@@ -31,7 +31,7 @@ class User extends Admin_Controller {
 
             $data['role']   = form_dropdown('role', $data2, null, 'class="form-control selectpicker" data-live-search="true"');
             $data['priv']   = $this->user_priviledge;            
-            $data['body']   = $this->_result_table();
+            // $data['body']   = $this->_result_table();
             $data['links']  = [anchor(str_replace('/create', '/import', base_url(uri_string())), '<i class="fa fa-file"></i> Import Data')];    
             $data['title']  = "Tambah {$this->module}";
             $this->slice->view('user.create', $data);

@@ -23,6 +23,7 @@ class MY_Controller extends MX_Controller {
         $this->load->model('mgmt/M_user','',TRUE);
         $this->load->model('mgmt/M_module','',TRUE);
         $this->load->model('mgmt/M_session','',TRUE);
+        $this->load->model('mgmt/M_permission','',TRUE);
         $this->load->model('mgmt/M_registration','',TRUE);
         
         // default timezone
