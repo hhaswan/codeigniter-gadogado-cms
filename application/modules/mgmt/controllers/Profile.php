@@ -25,11 +25,19 @@ class Profile extends Admin_Controller {
                 $data['status'] = $result[0]->status;
                 $data['role']   = $this->M_role->get(null, ['id' => $result[0]->app_role_id]);
 
+                // dapatkan nama divisi dari user
+                if($divisi = $this->M_division->get_user_division(['app_users_id' => $user_id])){
+                    $n_d = $this->M_division->get(null,['id' => $divisi[0]->app_divisions_id]);
+                    if($n_d){
+                        $data['divisi']     = $this->user_data->division_name; 
+                    }
+                }
+
                 // bila ini profile user sendiri
                 if($user_id == session($this->admin_identifier)['user_id']){
                     $data['is_self']    = true;
                     $data['title']      = "Profil Saya"; 
-                    $data['sessions']   = $this->M_session->get('app_sessions', [ 'app_users_id' => $user_id ]);
+                    $data['sessions']   = $this->M_session->get('app_sessions', [ 'app_users_id' => $user_id ], null, ['created_at' => 'desc']);
                 }else{
                     $data['is_self']    = false;       
                     $data['title']      = "Profil {$result[0]->full_name}";
@@ -37,6 +45,7 @@ class Profile extends Admin_Controller {
 
                 $this->slice->view('profile.index', $data);
             }else{
+                // TODO: GANTI 404 PAGE
                 show_404();
             }
         }elseif(post('submit')){

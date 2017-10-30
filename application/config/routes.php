@@ -6,7 +6,8 @@ $route['default_controller']    = 'landing';
 $route['404_override']          = '';
 $route['translate_uri_dashes']  = FALSE;
 
-// this is application routes
+// ini routes unik sesuai aplikasi
+$route['dashboard']				= 'mgmt/mgmt/index';
 $route['login']                 = 'mgmt/login/index';
 $route['login/(:any)']          = 'mgmt/login/index/$1';
 $route['register']              = 'mgmt/registration/index';

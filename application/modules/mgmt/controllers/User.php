@@ -12,10 +12,15 @@ class User extends Admin_Controller {
     }
     
     public function index(){
+        $data['action'] = [
+            anchor(base_url(uri_string().'/import'), '<i class="fa fa-file-excel-o fa-fw"></i> <span class="hidden-xs">Import Data</span>', 'class="btn btn-primary btn-sm"'),
+            anchor(base_url(uri_string().'/create'), '<i class="fa fa-plus"></i> <span class="hidden-xs">Tambah Data</span>', 'class="btn btn-primary btn-sm"'),
+            anchor(base_url(uri_string().'#'), '<i class="fa fa-trash"></i> <span class="hidden-xs">Hapus Data</span>>', 'class="btn btn-danger btn-sm btn-erase" data-url="'.base_url(uri_string().'/delete').'" disabled'),
+        ];
         $data['priv']   = $this->user_priviledge;
         $data['body']   = $this->_result_table();
         $data['title']  = "Management {$this->module}";
-        $this->slice->view('user.index', $data);
+        $this->slice->view('commons.index_master', $data);
     }
 
     public function create(){
@@ -24,14 +29,20 @@ class User extends Admin_Controller {
             
             // generate all role
             $data2  = [];
+            $data3  = [];
             $q      = $this->M_role->get(null, []);
             foreach($q as $row){
                 $data2 += [ $row->id => $row->name ];
             }
 
-            $data['role']   = form_dropdown('role', $data2, null, 'class="form-control selectpicker" data-live-search="true"');
+            $q      = $this->M_division->get(null, []);
+            foreach($q as $row){
+                $data3 += [ $row->id => $row->name ];
+            }
+
+            $data['div']    = form_dropdown('divisi', $data3, null, 'class="form-control selectpicker" data-live-search="true" required');
+            $data['role']   = form_dropdown('role', $data2, null, 'class="form-control selectpicker" data-live-search="true" required');
             $data['priv']   = $this->user_priviledge;            
-            // $data['body']   = $this->_result_table();
             $data['links']  = [anchor(str_replace('/create', '/import', base_url(uri_string())), '<i class="fa fa-file"></i> Import Data')];    
             $data['title']  = "Tambah {$this->module}";
             $this->slice->view('user.create', $data);
@@ -44,6 +55,7 @@ class User extends Admin_Controller {
                 ['status', 'Status User', 'required'],
                 ['confirm', 'Konfirmasi Email', 'required'],
                 ['password', 'Password', 'required|xss_clean'],
+                ['divisi', 'Divisi', 'required'],
                 ['password_confirmation', 'Konfirmasi Password', 'required|xss_clean|matches[password]']
             ]);
 
@@ -57,7 +69,7 @@ class User extends Admin_Controller {
                 // apakah user baru harus konfirmasi email?
                 // bila settingan mengharuskan maka pending statusnya dan kirim email ke user
 
-                $q = $this->M_registration->create(post(), post('role'), post('status'));
+                $q = $this->M_registration->create(post(), post('role'), post('status'), post('divisi'));
                 if(! empty($q)){
 
                     // kirim email konfirmasi ke user baru
@@ -413,6 +425,16 @@ class User extends Admin_Controller {
                         if($is_valid){
                             $i = $this->M_user->insert(null, $data);
                             if($i){
+                                // masukkan divisi sesuai dengan settingan website
+                                $setting = $this->M_setting->get(null, ['itemset' => 'NewUserDivision']);
+                                if($setting){
+                                    $data_d = [
+                                        'app_divisions_id'  => $setting[0]->val1,
+                                        'app_users_id'      => $i
+                                    ];
+                                    $this->M_division->insert_user_division($data_d);
+                                }
+
                                 $jumlah_insert++;
                             }
                         }
@@ -462,8 +484,14 @@ class User extends Admin_Controller {
                     $data2 += [ $row->id => $row->name ];
                 }
 
+                $qa     = $this->M_division->get(null, []);
+                foreach($qa as $row){
+                    $data3 += [ $row->id => $row->name ];
+                }
+
                 $data['id']     = $id_en;
                 $data['q']      = $q;
+                $data['div']    = form_dropdown('divisi', $data3, null, 'class="form-control selectpicker" data-live-search="true" required');
                 $data['role']   = form_dropdown('role', $data2, $q[0]->app_role_id, 'class="form-control selectpicker" data-live-search="true"');
                 $data['status'] = form_dropdown('status', $data3, $q[0]->status, 'class="form-control selectpicker" data-live-search="true"');
                 $data['links']  = $this->_quick_actions($id_en);                
@@ -483,6 +511,7 @@ class User extends Admin_Controller {
                     ['email', 'Email', 'trim|required'],
                     ['role', 'Role', 'required'],
                     ['status', 'Status User', 'required'],
+                    ['divisi', 'Divisi', 'required'],
                     ['password', 'Password', 'xss_clean']
                 ]);
                 
@@ -510,6 +539,17 @@ class User extends Admin_Controller {
                         'status'        => post('status'),
                         
                     ];
+
+                    // cek apakah divisi sudah ada atau belum
+                    if($dv = $this->M_division->get_user_division(['app_users_id' => $id])){
+                        // update
+                        $data_d = [ 'app_divisions_id' => post('divisi') ];
+                        $u = $this->M_division->update_user_division(['id' => $dv[0]->id], $data_d);
+                    }else{
+                        // insert
+                        $data_d = [ 'app_divisions_id' => post('divisi'), 'app_users_id' => $id ];
+                        $u = $this->M_division->insert_user_division($data_d);
+                    }
     
                     // insert ke table
                     $i = $this->M_user->update(null, [ 'id' => $id ], $data);
@@ -606,6 +646,7 @@ class User extends Admin_Controller {
             ['data' => 'No', 'class' => 'text-center', 'style' => 'width:8%;'],
             ['data' => 'Nama User'],
             ['data' => 'Role', 'class' => 'text-center'],
+            ['data' => 'Divisi', 'class' => 'text-center'],
             ['data' => 'Status', 'class' => 'text-center'],
             ['data' => 'Action', 'class' => 'text-center', 'style' => 'width:14%;']
         );
@@ -619,6 +660,14 @@ class User extends Admin_Controller {
             $registered = Carbon::parse($row->created_at)->diffForHumans();
             $role       = ($r = $this->M_role->get(null, [ 'id' => $row->app_role_id ])) ? ucwords($r[0]->name) : 'N/A';
             $status     = ($row->status == 1) ? "<label class='label label-success'>AKTIF</label>" : "<label class='label label-default'>INAKTIF</label>";
+
+            // divisi
+            $divisi = 'N/A';
+            if($dv  = $this->M_division->get_user_division(['app_users_id' => $row->id])){
+                if($dvn = $this->M_division->get(null, ['id' => $dv[0]->app_divisions_id])){
+                    $divisi = ucwords($dvn[0]->name);
+                }
+            }
 
             // tombol action
             $action = generate_actions([
@@ -637,33 +686,12 @@ class User extends Admin_Controller {
                 ['data' => ++$key, 'class' => 'text-center'],
                 ['data' => "<b>{$row->full_name}</b><span class='clearfix'>Email: {$email}</span><span class='clearfix'>Terdaftar: <span class='text-primary'>{$registered}</span></span>"],
                 ['data' => "<span class='text-bold text-primary'>{$role}</span>", 'class' => 'text-center'],
+                ['data' => "<span class='text-bold text-black'>{$divisi}</span>", 'class' => 'text-center'],
                 ['data' => $status, 'class' => 'text-center'],
                 ['data' => $action, 'class' => 'text-center']
             );
         }
 
         return generate_table();
-    }
-
-    function _filter(){
-        $filter = null;
-        $data = [
-            'type'      => 'text',
-            'name'      => 'query',
-            'class'     => 'form-control'            
-        ];
-
-        $data2 = [
-            'opt1'      => 'AAAA',
-            'opt2'      => 'AAAA',
-            'opt3'      => 'AAAA'
-        ];
-        
-        $filter = filter_form([
-            'Dropdown'  => form_dropdown('dropdown', $data2, null, 'class="form-control selectpicker" data-live-search="true"'),
-            'Keyword'   => form_input($data, null, 'placeholder="Kata Kunci"')
-        ]);
-
-        return $filter;
     }
 }

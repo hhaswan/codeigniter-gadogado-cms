@@ -56,6 +56,7 @@ class Login extends Front_Controller {
                     $this->slice->view('login.index', $data);
                 }else{
                     // login tidak dikenali, tampilkan halaman 404
+                    // TODO: GANTI 404 PAGE
                     show_404();
                 }
 
@@ -155,6 +156,7 @@ class Login extends Front_Controller {
                         $this->slice->view('login.forgot', $data);
                     }
                 }else{
+                    // TODO: GANTI 404 PAGE
                     show_404();    
                 }
             }else{
@@ -163,6 +165,7 @@ class Login extends Front_Controller {
                 $this->slice->view('login.forgot', $data);
             }
         }else{
+            // TODO: GANTI 404 PAGE
             show_404();
         }
 

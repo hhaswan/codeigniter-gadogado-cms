@@ -4,7 +4,7 @@
 	
 	<div class="login-box-body">
 		<div class="login-logo">
-			<a href="{{base_url()}}"><b>Code</b>Igniter</a>
+			<a href="{{base_url()}}"><b>{{ app()->name }}</b></a>
 		</div>
 		<h4 class="text-center">Masuk Ke Akun Anda</h4>
         @if(flash('MSG_ERROR'))

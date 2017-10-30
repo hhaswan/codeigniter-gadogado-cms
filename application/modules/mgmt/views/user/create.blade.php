@@ -55,6 +55,10 @@
                                 {{ $role }}
                             </div>
                             <div class="form-group">
+                                <label for="divisi">Divisi <span class="text-danger">*</span></label>
+                                {{ $div }}
+                            </div>
+                            <div class="form-group">
                                 <label for="role">Status User <span class="text-danger">*</span></label>
                                 <select name="status" class="form-control selectpicker" required>
                                     <option value="1">AKTIF</option>

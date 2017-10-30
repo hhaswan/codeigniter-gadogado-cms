@@ -4,7 +4,7 @@ class M_registration extends MY_Model{
     
     protected $table = 'app_users';    
 
-    public function create($request, $role_id, $status = 0){
+    public function create($request, $role_id, $status = 0, $division){
         
         $output = false;
 
@@ -25,6 +25,9 @@ class M_registration extends MY_Model{
             
             // return sesuai hasil query
             if(empty($query) || $query == 0){
+                // insert divi peruser
+                $this->insert('app_user_divisions', ['app_users_id' => $query, 'app_divisions_id' => $division]);
+                
                 $output = true;
             }else{
                 $output = $query;                

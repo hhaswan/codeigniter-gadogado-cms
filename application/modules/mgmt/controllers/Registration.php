@@ -42,7 +42,14 @@ class Registration extends Admin_Controller {
                     $must_validate = 1;
                 }
 
-                $q = $this->M_registration->create(post(), 2, $must_validate);
+                // dapatkan default role yang diberikan kepada user baru
+                $setting = $this->M_setting->get(null, ['itemset' => 'NewUserRole']);
+                if($setting){
+                    $q = $this->M_registration->create(post(), $setting[0]->val1, $must_validate);                    
+                }else{
+                    $q = null;
+                }
+
                 if(! empty($q)){
 
                     // kirim email konfirmasi ke user baru
@@ -83,6 +90,7 @@ class Registration extends Admin_Controller {
     public function confirm($token){
 
         if(empty($token)){
+            // TODO: GANTI 404 PAGE
             show_404();
         }else{
             // cek token untuk konfirmasi email
@@ -106,6 +114,7 @@ class Registration extends Admin_Controller {
                 $link = (app()->secure_login) ? '/'.app()->login_identifier : NULL;
                 redirect(base_url('login'.$link));
             }else{
+                // TODO: GANTI 404 PAGE
                 show_404();
             }
         }

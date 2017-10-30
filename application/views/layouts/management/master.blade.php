@@ -8,6 +8,7 @@
 		@include('layouts.management.nav')
 		@include('layouts.management.sidebar')
 		<div class="content-wrapper">
+			@if(! isset($error_page))
 			<section class="content-header">
 				<h1>{{$title}}</h1>
 				<ol class="breadcrumb">
@@ -26,13 +27,14 @@
 					@endforeach
 				</ol>
 			</section>
+			@endif
 			<section class="content">
 				@yield('content')
 			</section>
 		</div>
 		<footer class="main-footer">
-			<div class="pull-right hidden-xs"><b>Framework Version</b> {{CI_VERSION}}</div>
-			<strong>Copyright &copy; {{Carbon\Carbon::now()->format('Y')}} - <a href="{{base_url()}}">{{app()->name}}</a></strong>
+			<div class="pull-right hidden-xs"><b>Versi Aplikasi</b> {{app()->version}}</div>
+			<strong>Hak Cipta &copy; {{Carbon\Carbon::now()->format('Y')}} - <a href="{{base_url()}}">{{app()->name}}</a></strong>
 		</footer>
 	</div>
 	@include('layouts.management.footer')

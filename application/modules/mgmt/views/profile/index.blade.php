@@ -9,7 +9,10 @@
                     <i class="fa fa-user-circle fa-5x" data-toggle="tooltip" title="{{ $name }}"></i>
                     <h3 class="profile-username text-center">
                         {{ word_limiter($name, 2, "") }}
-                        <p class="text-muted text-center small">{{ $role[0]->name }}</p>
+                        <p class="text-muted text-center small">
+                            {{ $role[0]->name }}<br/><br/>
+                            <span class="label label-primary">{{ ucwords($divisi) }}</span>
+                        </p>
                     </h3>
                 </p>
                 <ul class="list-group list-group-unbordered">

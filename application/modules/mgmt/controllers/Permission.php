@@ -12,10 +12,13 @@ class Permission extends Admin_Controller {
     }
     
     public function index(){
+        $data['action'] = [
+            anchor(base_url(uri_string().'/import'), '<i class="fa fa-file-excel-o fa-fw"></i> <span class="hidden-xs">Import Data</span>', 'class="btn btn-primary btn-sm"')
+        ];
         $data['priv']   = $this->user_priviledge;
         $data['body']   = $this->_result_table();
         $data['title']  = "Management {$this->module}";
-        $this->slice->view('permission.index', $data);
+        $this->slice->view('commons.index_master', $data);
     }
 
     public function edit($id_en){
@@ -121,7 +124,7 @@ class Permission extends Admin_Controller {
                     $this->table->add_row($action_content);
                 }
 
-                $data['filter'] = $this->_filter(get());
+                $data['filter'] = $this->_filter();
                 $data['id']     = $id_en;
                 $data['q']      = $q;
                 $data['body']   = generate_table();
@@ -653,7 +656,7 @@ class Permission extends Admin_Controller {
         return generate_table();
     }
 
-    function _filter($data = null){
+    function _filter(){
         $filter = null;
         
         // modul dropdown

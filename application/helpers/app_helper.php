@@ -85,15 +85,20 @@ if ( ! function_exists('generate_table')){
 **/
 if ( ! function_exists('generate_actions')){
     function generate_actions(array $option = [], $permission = null, $class){
-        $output = [];
-        $list   = null;
+        $output     = [];
+        $list       = null;
+        $is_empty   = true;
+
         foreach($option as $key => $row){
             // cek permission
             if(! empty($permission)){
-                if(isset($permission->$key)){
+                if(isset($permission->$key) && $permission->$key){
 
                     // cek apakah dalam class ini (ctrl) ada method dengan key ini
                     if(method_exists($class, $key)){
+                        
+                        $is_empty = false;
+
                         if($key == 'delete'){
                             $list .= '<li class="divider"></li><li>'.$row.'</li>';
                         }else{
@@ -113,9 +118,14 @@ if ( ! function_exists('generate_actions')){
             }
         }
 
-        $output = '<div class="btn-group"><button type="button" class="btn btn-primary btn-flat btn-xs dropdown-toggle" data-toggle="dropdown">
-                        <i class="fa fa-cog"></i>&nbsp;<span class="caret"></span><span class="sr-only">Toggle Dropdown</span>
-                   </button><ul class="dropdown-menu dropdown-menu-right" role="menu">'.$list.'</ul></div>';
+        if(! $is_empty){
+            $output = '<div class="btn-group"><button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown">
+                    <i class="fa fa-cog"></i>&nbsp;<span class="caret"></span><span class="sr-only">Toggle Dropdown</span>
+            </button><ul class="dropdown-menu dropdown-menu-right" role="menu">'.$list.'</ul></div>';
+        }else{
+            $output = '<i class="fa fa-eye-slash text-gray fa-fw"></i>';
+        }
+
         return $output;
     }
 }
@@ -585,7 +595,7 @@ if(!function_exists('do_upload'))
 			if(array_key_exists('size', $conf)){
 				$config['max_size'] 		= $conf['size']; // in kB
 			}else{
-				$config['max_size'] 		= 2048;				
+				$config['max_size'] 		= ini_get("upload_max_filesize"); // maskimal dari php ini		
 			}
 
 			// default upload path
@@ -617,7 +627,9 @@ if(!function_exists('do_upload'))
 				$config['encrypt_name'] 	= TRUE;				
 			}
 			
-			$CI->load->library('upload', $config);
+			$CI->load->library('upload');
+            $CI->upload->initialize($config);
+
 			$upload = $CI->upload->do_upload($identifier);
 			if($upload){
 				return array('status' => 1, 'data' => $CI->upload->data());

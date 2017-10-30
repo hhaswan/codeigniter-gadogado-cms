@@ -12,10 +12,14 @@ class Module extends Admin_Controller {
     }
     
     public function index(){
+        $data['action'] = [
+            anchor(base_url(uri_string().'/create'), '<i class="fa fa-plus"></i> <span class="hidden-xs">Tambah Data</span>', 'class="btn btn-primary btn-sm"'),
+            anchor(base_url(uri_string().'#'), '<i class="fa fa-trash"></i> <span class="hidden-xs">Hapus Data</span>>', 'class="btn btn-danger btn-sm btn-erase" data-url="'.base_url(uri_string().'/delete').'" disabled'),
+        ];
         $data['priv']   = $this->user_priviledge;
         $data['body']   = $this->_result_table();
         $data['title']  = "Management {$this->module}";
-        $this->slice->view('module.index', $data);
+        $this->slice->view('commons.index_master', $data);
     }
 
     public function create(){
@@ -199,7 +203,6 @@ class Module extends Admin_Controller {
                 flash(['MSG_ERROR' => validation_errors()]);
                 redirect(back());
             }
-            
         }
     }
 
@@ -375,7 +378,6 @@ class Module extends Admin_Controller {
                 redirect(back());
             }
         }
-
     }
 
     public function delete(){
@@ -471,28 +473,6 @@ class Module extends Admin_Controller {
         }
 
         return generate_table();
-    }
-
-    function _filter(){
-        $filter = null;
-        $data = [
-            'type'      => 'text',
-            'name'      => 'query',
-            'class'     => 'form-control'            
-        ];
-
-        $data2 = [
-            'opt1'      => 'AAAA',
-            'opt2'      => 'AAAA',
-            'opt3'      => 'AAAA'
-        ];
-        
-        $filter = filter_form([
-            'Dropdown'  => form_dropdown('dropdown', $data2, null, 'class="form-control selectpicker" data-live-search="true"'),
-            'Keyword'   => form_input($data, null, 'placeholder="Kata Kunci"')
-        ]);
-
-        return $filter;
     }
 
     function _delete_files($target) {

@@ -1,7 +1,7 @@
-<script src="{{base_url()}}adminlte/components/jquery/dist/jquery.min.js"></script>
-<script src="{{base_url()}}adminlte/components/bootstrap/dist/js/bootstrap.min.js"></script>
-<script src="{{base_url()}}adminlte/plugins/iCheck/icheck.min.js"></script>
-<script src="{{base_url()}}adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
+<script src="{{app()->template_back}}components/jquery/dist/jquery.min.js"></script>
+<script src="{{app()->template_back}}components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="{{app()->template_back}}plugins/iCheck/icheck.min.js"></script>
+<script src="{{app()->template_back}}plugins/sweetalert2/sweetalert2.min.js"></script>
 @yield('custom_js')
 @if(flash('GLOBAL_ALERT_SUCCESS'))
 <script>

@@ -5,7 +5,7 @@
         <div class="box box-primary">
             <div class="box-header with-border">
                 <div class="box-title pull-left btn-group">
-                    <a href="{{ str_replace('/edit/'.$id, '', base_url(uri_string())) }}" class="btn btn-primary btn-sm">
+                    <a href="{{ str_replace('/create', '', base_url(uri_string().'/create')) }}" class="btn btn-primary btn-sm">
                         <i class="fa fa-arrow-left"></i> <span class="hidden-xs"> Management Data</span>
                     </a>
                 </div>
@@ -30,33 +30,21 @@
                             <div class="text-danger text-center">{{flash('MSG_ERROR')}}</div>
                         @endif
                         <form method="post" action="{{ base_url(uri_string()) }}">
-                            <input type="hidden" value="_patch" name="method" />
-                            <div class="form-group has-feedback">
-                                <label for="nama">Nama Lengkap <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="nama" name="nama" placeholder="Nama Lengkap" value="{{ $q[0]->full_name }}" required>
-                                <span class="fa fa-user form-control-feedback"></span>
-                            </div>
-                            <div class="form-group has-feedback">
-                                <label for="email">Email <span class="text-danger">*</span></label>
-                                <input type="email" class="form-control" id="email" name="email" placeholder="Email" value="{{ $q[0]->email }}" required>
-                                <span class="fa fa-envelope form-control-feedback"></span>
-                            </div>
-                            <div class="form-group has-feedback">
-                                <label for="password">Password Baru <small class="text-danger">(isi bila ingin mengubah password)</small></label>
-                                <input type="password" class="form-control" id="password" name="password" placeholder="Password">
-                                <span class="fa fa-lock form-control-feedback"></span>
+                            <div class="form-group">
+                                <label>Nama Role</label>
+                                <input type="text" class="form-control" name="nama" placeholder="Masukkan Data" required>
                             </div>
                             <div class="form-group">
-                                <label for="role">Role <span class="text-danger">*</span></label>
-                                {{ $role }}
+                                <label>Level Akses</label>
+                                <select name="access" class="form-control selectpicker" required>
+                                    <option value="0">NORMAL</option>
+                                    <option value="1">AKSES SEMUA DATA</option>
+                                </select>
                             </div>
-                            <div class="form-group">
-                                <label>Divisi</label>
-                                {{ $div }}
-                            </div>
-                            <div class="form-group">
-                                <label for="role">Status User <span class="text-danger">*</span></label>
-                                {{ $status }}
+                            <div class="form-group" id="access-form">
+                                <label>Area Akses Diluar Divisi Ini</label>
+                                {{ $area }}
+                                <small class="text-muted">Kosongkan bila divisi ini hanya dapat mengakses data dari divisi ini saja.</small>
                             </div>
                             <div class="form-group text-right">
                                 <button type="submit" class="btn btn-primary" name="submit" value="submit">
@@ -67,7 +55,7 @@
                     </div>
                     <div class="col-lg-5">
                         <h4 class="text-bold">Petunjuk:</h4>
-                        <p>Edit beberapa informasi di samping untuk melakukan perubahan terhadap data ini.</p>
+                        <p>Lengkapilah form yang diperlukan di sebelah untuk dapat membuat data baru.</p>
                     </div>
                 </div>
             </div>
@@ -78,6 +66,22 @@
 
 @section('custom_js')
 <script>
+    $(document).ready(function(){
+        var access_val = $('#access-sel option:selected').val();
+        if(access_val == 1){
+            $('#access-form').fadeOut('fast');
+        }else{
+            $('#access-form').fadeIn('fast');
+        }
+    });
 
+    $(document).on('change', '#access-sel', function(){
+        var access_val = $('#access-sel option:selected').val();
+        if(access_val == 1){
+            $('#access-form').fadeOut('fast');
+        }else{
+            $('#access-form').fadeIn('fast');
+        }
+    });
 </script>
 @endsection
